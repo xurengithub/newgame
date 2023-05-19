@@ -23,4 +23,6 @@ Thumbs.db
 /dist
 /target
 
+/.idea
+
 # 忽略第三方库和依
