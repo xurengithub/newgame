@@ -102,8 +102,8 @@ public class GameKcpServer extends KcpServer {
     private void execute(INetChannel netChannel, NetMsg msg) {
         int msgCode = msg.getMsgCode();
 
-        new String(msg.getData());
-        netChannel.sendMsg(msg);
+        System.out.println(new String(msg.getData()));
+        netChannel.sendMsg(new String(msg.getData()));
     }
 
     @Override
