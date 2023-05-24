@@ -11,6 +11,7 @@
     <modules>
         <module>gameserver</module>
         <module>common</module>
+        <module>realtimeserver</module>
     </modules>
 
 
