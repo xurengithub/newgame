@@ -20,6 +20,7 @@ public class GameKcpServer extends KcpServer {
 
     @Override
     public void handleReceive(ByteBuf byteBuf, KcpOnUdp kcpOnUdp) {
+        // [bodyLength:4][type:1][package:1]\[requestId:4][opCode:4][dataLength:4][ridLength:1][rid:x][data:y]
         int bodyLength = byteBuf.readInt();
         if (bodyLength <= 0 || bodyLength > NetConstants.BODY_LENGTH) {
             kcpOnUdp.close();
@@ -103,7 +104,7 @@ public class GameKcpServer extends KcpServer {
         int msgCode = msg.getMsgCode();
 
         System.out.println(new String(msg.getData()));
-        netChannel.sendMsg(new String(msg.getData()));
+        netChannel.sendMsg(msg);
     }
 
     @Override
