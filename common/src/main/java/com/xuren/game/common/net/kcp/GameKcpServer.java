@@ -53,7 +53,9 @@ public class GameKcpServer extends KcpServer {
         TypeEnum typeEnum = msg.getType();
         switch (typeEnum) {
             case DATA: data(msg, kcpOnUdp);
+            break;
             case INIT: init(msg, kcpOnUdp);
+            break;
             default:throw new IllegalStateException("type error:" + typeEnum.name());
         }
     }
@@ -73,6 +75,7 @@ public class GameKcpServer extends KcpServer {
         ByteBuf bf = Unpooled.copiedBuffer(msg.getData());
         switch (packageTypeEnum) {
             case REQUEST: request(netChannel, msg, bf);
+            break;
         }
     }
 

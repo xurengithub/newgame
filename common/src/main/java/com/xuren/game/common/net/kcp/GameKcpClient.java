@@ -1,10 +1,12 @@
 package com.xuren.game.common.net.kcp;
 
 import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.consts.NetConstants;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.util.ResourceLeakDetector;
 import org.beykery.jkcp.Kcp;
 import org.beykery.jkcp.KcpClient;
@@ -74,28 +76,26 @@ public class GameKcpClient extends KcpClient {
 
     private ByteBuf gen(NetMsg msg) {
         // [bodyLength:4][type:1][package:1]\[requestId:4][opCode:4][dataLength:4][ridLength:1][rid:x][data:y]
-        var data = msg.getData();
-        var rid = msg.getRid();
-        var ridData = rid.getBytes(StandardCharsets.UTF_8);
-        var buf = PooledByteBufAllocator.DEFAULT.buffer();
-        buf.writeInt(buf.readableBytes() + 1);
-        buf.writeByte(msg.getType().value());
-        buf.writeByte(msg.getPackageTypeEnum().value());
-        buf.writeInt(msg.getMsgCode());
-        buf.writeInt(data.length + ridData.length + 1);
-        buf.writeByte(ridData.length);
-        buf.writeBytes(ridData);
 
-        buf.writeInt(msg.getRequestId());
-        buf.writeBytes(data);
+        byte[] ridBytes = msg.getRid().getBytes();
+        int ridLength = ridBytes.length;
+        int surplusDataLength = msg.getData().length;
+        int dataLength = 1 + ridLength + surplusDataLength;
 
+        int dataPoolSize = 4 + 4 + 4 + 1 + msg.getRid().getBytes().length + msg.getData().length;
+        int allPoolSize = 4 + 1 + 1 + dataPoolSize;
+        int bodyLength = dataPoolSize + 2;
 
-
-
-
-
-
-
-        return buf;
+        ByteBuf bf = Unpooled.buffer(allPoolSize);
+        bf.writeInt(bodyLength);
+        bf.writeByte(msg.getType().value());
+        bf.writeByte(msg.getPackageTypeEnum().value());
+        bf.writeInt(msg.getRequestId());
+        bf.writeInt(msg.getMsgCode());
+        bf.writeInt(dataLength);
+        bf.writeByte(ridLength);
+        bf.writeBytes(ridBytes);
+        bf.writeBytes(msg.getData());
+        return bf;
     }
 }
