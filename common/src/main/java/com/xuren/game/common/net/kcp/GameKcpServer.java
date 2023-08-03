@@ -1,5 +1,6 @@
 package com.xuren.game.common.net.kcp;
 
+import com.alibaba.fastjson.JSON;
 import com.xuren.game.common.net.INetChannel;
 import com.xuren.game.common.net.KcpNetChannel;
 import com.xuren.game.common.net.NetMsg;
@@ -105,7 +106,7 @@ public class GameKcpServer extends KcpServer {
 
     private void execute(INetChannel netChannel, NetMsg msg) {
         int msgCode = msg.getMsgCode();
-
+        System.out.println(JSON.toJSONString(msg));
         System.out.println(new String(msg.getData()));
         netChannel.sendMsg(msg);
     }
