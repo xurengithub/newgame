@@ -26,3 +26,6 @@ Thumbs.db
 /.idea
 
 # 忽略第三方库和依
+
+/*.iml
+*.iml
