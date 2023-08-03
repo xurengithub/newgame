@@ -12,6 +12,7 @@
         <module>gameserver</module>
         <module>common</module>
         <module>realtimeserver</module>
+        <module>httpserver</module>
     </modules>
 
 
