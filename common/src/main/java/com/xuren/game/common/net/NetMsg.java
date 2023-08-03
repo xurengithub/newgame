@@ -17,6 +17,8 @@ public class NetMsg implements Cleanable {
     private String rid;
     private byte[] data;
 
+    private String version = "";
+
     public TypeEnum getType() {
         return type;
     }
@@ -63,6 +65,14 @@ public class NetMsg implements Cleanable {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @Override

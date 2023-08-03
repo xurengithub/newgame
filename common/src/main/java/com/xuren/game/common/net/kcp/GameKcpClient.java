@@ -1,6 +1,7 @@
 package com.xuren.game.common.net.kcp;
 
 import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.common.net.consts.NetConstants;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
@@ -59,7 +60,7 @@ public class GameKcpClient extends KcpClient {
         msg.setType(TypeEnum.INIT);
         msg.setPackageTypeEnum(PackageTypeEnum.REQUEST);
         msg.setRequestId(1);
-        tc.send(tc.gen(msg));
+        tc.send(NetUtils.buildRequest(msg));
 
 
         NetMsg msg2 = new NetMsg();
@@ -69,33 +70,8 @@ public class GameKcpClient extends KcpClient {
         msg2.setType(TypeEnum.DATA);
         msg2.setPackageTypeEnum(PackageTypeEnum.REQUEST);
         msg2.setRequestId(1);
-        tc.send(tc.gen(msg2));
+        tc.send(NetUtils.buildRequest(msg));
 
     }
 
-
-    private ByteBuf gen(NetMsg msg) {
-        // [bodyLength:4][type:1][package:1]\[requestId:4][opCode:4][dataLength:4][ridLength:1][rid:x][data:y]
-
-        byte[] ridBytes = msg.getRid().getBytes();
-        int ridLength = ridBytes.length;
-        int surplusDataLength = msg.getData().length;
-        int dataLength = 1 + ridLength + surplusDataLength;
-
-        int dataPoolSize = 4 + 4 + 4 + 1 + msg.getRid().getBytes().length + msg.getData().length;
-        int allPoolSize = 4 + 1 + 1 + dataPoolSize;
-        int bodyLength = dataPoolSize + 2;
-
-        ByteBuf bf = Unpooled.buffer(allPoolSize);
-        bf.writeInt(bodyLength);
-        bf.writeByte(msg.getType().value());
-        bf.writeByte(msg.getPackageTypeEnum().value());
-        bf.writeInt(msg.getRequestId());
-        bf.writeInt(msg.getMsgCode());
-        bf.writeInt(dataLength);
-        bf.writeByte(ridLength);
-        bf.writeBytes(ridBytes);
-        bf.writeBytes(msg.getData());
-        return bf;
-    }
 }
