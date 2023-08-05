@@ -14,6 +14,7 @@ import com.xuren.game.logic.scene.options.Option;
 import com.xuren.game.logic.scene.options.OptionType;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
+import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
 
 import java.util.List;
@@ -26,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 public class Scene {
     private String id;
     private long prevTimeMs = 0;
-    private long deltaTimeMs = 0;
-    private long deltaTime = 0;
+    public long deltaTimeMs = 0;
+    public float deltaTime = 0;
     private final List<SceneEvent> queue = Lists.newArrayList();
 
-    public Map<String, PlayerEntity> onlinePlayerMap = Maps.newHashMap();
+    private Map<String, PlayerEntity> onlinePlayerMap = Maps.newHashMap();
 
     private Map<Integer, MonsterEntity> monsterMap = Maps.newHashMap();
 
@@ -44,22 +45,26 @@ public class Scene {
         executor.scheduleAtFixedRate(this::gameLoop,0,  50, TimeUnit.MILLISECONDS);
     }
 
-    private void gameLoop() {
-        long curMs = System.currentTimeMillis();
-        this.deltaTimeMs = curMs - this.prevTimeMs;
-        this.deltaTime = (long) (this.deltaTimeMs / 1000.0f);
-        this.prevTimeMs = curMs;
-        onLogicUpdate();
+    public void addPlayer(PlayerEntity playerEntity) {
+        onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
     }
 
-    public void addScene(SceneEvent event) {
+    public void addSceneEvent(SceneEvent event) {
         synchronized (queue) {
             queue.add(event);
         }
     }
 
+    private void gameLoop() {
+        long curMs = System.currentTimeMillis();
+        this.deltaTimeMs = curMs - this.prevTimeMs;
+        this.deltaTime = (this.deltaTimeMs / 1000.0f);
+        this.prevTimeMs = curMs;
+        onLogicUpdate();
+    }
+
     private void onLogicUpdate() {
-        Log.data.info("logic update");
+        Log.data.info("logic update deltaTime:{} deltaTimeMs:{}", deltaTime, deltaTimeMs);
         synchronized (queue) {
             for (SceneEvent event : queue) {
                 var playerEntity = getOnlinePlayer(event.getRid());
@@ -70,8 +75,16 @@ public class Scene {
 
         // 迭代摇杆操作
         for (PlayerEntity playerEntity : onlinePlayers()) {
+            if (playerEntity.getState() == SceneState.DEATH) {
+                continue;
+            }
+
             if (Objects.nonNull(playerEntity.getJoystickComponent()) && Objects.nonNull(playerEntity.getTransformComponent()) && Objects.nonNull(playerEntity.getHealthComponent())) {
                 JoystickSystem.update(playerEntity);
+            }
+
+            if (Objects.nonNull(playerEntity.getaStarComponent()) && Objects.nonNull(playerEntity.getTransformComponent())) {
+                AStarNavSystem.update(playerEntity, this);
             }
         }
         // 1.处理事件
@@ -93,10 +106,22 @@ public class Scene {
             if (opt.getOptionType() == OptionType.FIND_WAY.getType()) {
                 FindWayOption findWayOption = (FindWayOption) opt;
                 if (Objects.nonNull(playerEntity.getTransformComponent())) {
-                    AStarNavSystem.initAStarComponent(playerEntity, easy3dNav, findWayOption.getPoint());
+                    processFindWay(playerEntity, easy3dNav, findWayOption.getPoint());
                 }
             }
         }
+    }
+
+    private void processFindWay(PlayerEntity playerEntity, Easy3dNav easy3dNav, Vector3f point) {
+        if (playerEntity.getState() != SceneState.IDLE && playerEntity.getState() != SceneState.RUN) {
+            return;
+        }
+        if (!AStarNavSystem.initAStarComponent(playerEntity, easy3dNav, point)) {
+            return;
+        }
+
+        // todo 广播给其他AOI玩家状态变化,操作opt，位移组件，状态同步太其他玩家
+        playerEntity.setState(SceneState.RUN);
     }
 
     private List<PlayerEntity> onlinePlayers() {
@@ -105,5 +130,9 @@ public class Scene {
 
     private PlayerEntity getOnlinePlayer(String rid) {
         return onlinePlayerMap.get(rid);
+    }
+
+    public Map<String, PlayerEntity> getOnlinePlayerMap() {
+        return onlinePlayerMap;
     }
 }

@@ -12,12 +12,12 @@ import java.util.Map;
 public abstract class SceneManager {
     private static Map<String, Scene> sceneMap = Maps.newHashMap();
 
-    private static void initScene() throws IOException {
+    public static void initScene() throws IOException {
         Easy3dNav easy3dNav = new Easy3dNav();
         easy3dNav.setPrintMeshInfo(true);
         easy3dNav.init("dungeon.obj");
         Scene scene = new Scene();
-        scene.init("艾欧尼亚", easy3dNav);
+        scene.init("1", easy3dNav);
         sceneMap.put("1", scene);
     }
 

@@ -5,7 +5,8 @@ package com.xuren.game.logic.scene;
  */
 public enum SceneState {
     IDLE(0),
-    RUN(1);
+    RUN(1),
+    DEATH(2);
 
     SceneState(int state) {
         this.state = state;
