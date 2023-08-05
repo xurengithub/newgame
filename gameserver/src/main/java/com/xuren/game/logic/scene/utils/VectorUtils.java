@@ -13,4 +13,8 @@ public abstract class VectorUtils {
     public static Vector3f create(float x, float y, float z) {
         return new Vector3f(x, y, z);
     }
+
+    public static double distance(Vector3f start, Vector3f end) {
+        return Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2) + Math.pow(end.z - start.z, 2));
+    }
 }

@@ -37,5 +37,12 @@ public class AStarNavSystem {
 
         aStarComponent.setNowTime(0);
 
+        aStarComponent.setTotalTime();
+
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Math.sin(30));;
+        System.out.println(Math.asin(0.5));
     }
 }
