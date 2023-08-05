@@ -2,15 +2,10 @@ package com.xuren.game.logic.scene.nav;
 
 import org.recast4j.detour.*;
 import org.recast4j.detour.extras.Vector3f;
-import org.recast4j.detour.io.MeshDataReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,8 +14,8 @@ import java.util.stream.Collectors;
 /**
  * @author xuren
  */
-public class MyEasy3dNav implements EasyNavFunc{
-    private static Logger LOGGER = LoggerFactory.getLogger(MyEasy3dNav.class);
+public class Easy3dNav implements EasyNavFunc{
+    private static Logger LOGGER = LoggerFactory.getLogger(Easy3dNav.class);
 
 
     /**
@@ -38,7 +33,7 @@ public class MyEasy3dNav implements EasyNavFunc{
     private float[] extents = {2.f, 2.f, 2.f};
 
 
-    public MyEasy3dNav() {
+    public Easy3dNav() {
 
     }
 
@@ -47,13 +42,13 @@ public class MyEasy3dNav implements EasyNavFunc{
      * @param useU3dData  是否使用critterAi数据
      * @param printMeshInfo  是否打印地图西信息
      */
-    public MyEasy3dNav(boolean useU3dData, boolean printMeshInfo) {
+    public Easy3dNav(boolean useU3dData, boolean printMeshInfo) {
         this.useU3dData = useU3dData;
         this.printMeshInfo = printMeshInfo;
     }
 
     //navmesh 文件路径
-    public MyEasy3dNav(String filePath) throws IOException {
+    public Easy3dNav(String filePath) throws IOException {
         init(filePath);
     }
 

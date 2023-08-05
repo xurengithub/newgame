@@ -7,7 +7,12 @@ public enum OptionType {
     /**
      * 摇杆
      */
-    JOYSTICK(0);
+    JOYSTICK(0),
+
+    /**
+     * FindWay
+     */
+    FIND_WAY(1),;
 
     OptionType(int type) {
         this.type = type;

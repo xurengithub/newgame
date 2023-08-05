@@ -2,14 +2,18 @@ package com.xuren.game.logic.scene;
 
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
+import com.xuren.game.logic.scene.components.AStarComponent;
 import com.xuren.game.logic.scene.components.JoystickComponent;
 import com.xuren.game.logic.scene.entities.MonsterEntity;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.events.SceneEvent;
+import com.xuren.game.logic.scene.nav.Easy3dNav;
+import com.xuren.game.logic.scene.options.FindWayOption;
 import com.xuren.game.logic.scene.options.JoystickOption;
 import com.xuren.game.logic.scene.options.Option;
 import com.xuren.game.logic.scene.options.OptionType;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
+import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
 import org.testng.collections.Maps;
 
 import java.util.List;
@@ -30,15 +34,11 @@ public class Scene {
 
     private Map<Integer, MonsterEntity> monsterMap = Maps.newHashMap();
 
-    private boolean[][] mapData;
-    private int mapWidth;
-    private int mapHeight;
+    private Easy3dNav easy3dNav;
 
-    public void init(String id, boolean[][] mapData, int mapWidth, int mapHeight) {
+    public void init(String id, Easy3dNav easy3dNav) {
         this.id = id;
-        this.mapData = mapData;
-        this.mapWidth = mapWidth;
-        this.mapHeight = mapHeight;
+        this.easy3dNav = easy3dNav;
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "game-loop-pool"));
         executor.scheduleAtFixedRate(this::gameLoop,0,  50, TimeUnit.MILLISECONDS);
@@ -87,6 +87,13 @@ public class Scene {
                     JoystickComponent joystickComponent = playerEntity.getJoystickComponent();
                     joystickComponent.setDegree(joyStickOption.getDegree());
                     joystickComponent.setOpen(joyStickOption.isOpen());
+                }
+            }
+
+            if (opt.getOptionType() == OptionType.FIND_WAY.getType()) {
+                FindWayOption findWayOption = (FindWayOption) opt;
+                if (Objects.nonNull(playerEntity.getTransformComponent())) {
+                    AStarNavSystem.initAStarComponent(playerEntity, easy3dNav, findWayOption.getPoint());
                 }
             }
         }

@@ -6,12 +6,9 @@ package com.xuren.game.logic.scene.components;
 public class HealthComponent {
     private int hp;
     private int mp;
-    private float speed;
-
-    public HealthComponent(int hp, int mp, float speed) {
+    public HealthComponent(int hp, int mp) {
         this.hp = hp;
         this.mp = mp;
-        this.speed = speed;
     }
 
     public int getHp() {
@@ -30,15 +27,7 @@ public class HealthComponent {
         this.mp = mp;
     }
 
-    public float getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(float speed) {
-        this.speed = speed;
-    }
-
-    public static HealthComponent create(int hp, int mp, int speed) {
-        return new HealthComponent(hp, mp, speed);
+    public static HealthComponent create(int hp, int mp) {
+        return new HealthComponent(hp, mp);
     }
 }

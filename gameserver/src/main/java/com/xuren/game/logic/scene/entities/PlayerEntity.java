@@ -1,6 +1,7 @@
 package com.xuren.game.logic.scene.entities;
 
 import com.xuren.game.logic.scene.SceneState;
+import com.xuren.game.logic.scene.components.AStarComponent;
 import com.xuren.game.logic.scene.components.HealthComponent;
 import com.xuren.game.logic.scene.components.JoystickComponent;
 import com.xuren.game.logic.scene.components.TransformComponent;
@@ -10,7 +11,7 @@ public class PlayerEntity {
     private SceneState state;
     private TransformComponent transformComponent;
     private JoystickComponent joystickComponent;
-
+    private AStarComponent aStarComponent;
     private HealthComponent healthComponent;
 
     public String getRid() {
@@ -43,6 +44,14 @@ public class PlayerEntity {
 
     public void setJoystickComponent(JoystickComponent joystickComponent) {
         this.joystickComponent = joystickComponent;
+    }
+
+    public AStarComponent getaStarComponent() {
+        return aStarComponent;
+    }
+
+    public void setaStarComponent(AStarComponent aStarComponent) {
+        this.aStarComponent = aStarComponent;
     }
 
     public HealthComponent getHealthComponent() {
