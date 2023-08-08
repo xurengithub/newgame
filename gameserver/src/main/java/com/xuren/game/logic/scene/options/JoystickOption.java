@@ -5,7 +5,8 @@ package com.xuren.game.logic.scene.options;
  */
 public class JoystickOption extends Option{
     private boolean open;
-    private int degree;
+    private float degree;
+    private float cameraEulerY;
 
     public boolean isOpen() {
         return open;
@@ -15,11 +16,19 @@ public class JoystickOption extends Option{
         this.open = open;
     }
 
-    public int getDegree() {
+    public float getDegree() {
         return degree;
     }
 
-    public void setDegree(int degree) {
+    public void setDegree(float degree) {
         this.degree = degree;
+    }
+
+    public float getCameraEulerY() {
+        return cameraEulerY;
+    }
+
+    public void setCameraEulerY(float cameraEulerY) {
+        this.cameraEulerY = cameraEulerY;
     }
 }

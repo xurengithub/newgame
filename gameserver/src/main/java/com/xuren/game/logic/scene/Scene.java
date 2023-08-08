@@ -79,8 +79,8 @@ public class Scene {
                 continue;
             }
 
-            if (Objects.nonNull(playerEntity.getJoystickComponent()) && Objects.nonNull(playerEntity.getTransformComponent()) && Objects.nonNull(playerEntity.getHealthComponent())) {
-                JoystickSystem.update(playerEntity);
+            if (Objects.nonNull(playerEntity.getJoystickComponent()) && playerEntity.getJoystickComponent().isOpen() && Objects.nonNull(playerEntity.getTransformComponent())) {
+                JoystickSystem.update(playerEntity, this, easy3dNav);
             }
 
             if (Objects.nonNull(playerEntity.getaStarComponent()) && Objects.nonNull(playerEntity.getTransformComponent())) {
@@ -94,22 +94,34 @@ public class Scene {
 
     private void processEvent(PlayerEntity playerEntity, SceneEvent event) {
         for (Option opt : event.getOptions()) {
-            if (opt.getOptionType() == OptionType.JOYSTICK.getType()) {
-                JoystickOption joyStickOption = (JoystickOption) opt;
-                if (Objects.nonNull(playerEntity.getJoystickComponent())) {
-                    JoystickComponent joystickComponent = playerEntity.getJoystickComponent();
-                    joystickComponent.setDegree(joyStickOption.getDegree());
-                    joystickComponent.setOpen(joyStickOption.isOpen());
-                }
-            }
-
             if (opt.getOptionType() == OptionType.FIND_WAY.getType()) {
                 FindWayOption findWayOption = (FindWayOption) opt;
                 if (Objects.nonNull(playerEntity.getTransformComponent())) {
                     processFindWay(playerEntity, easy3dNav, findWayOption.getPoint());
                 }
             }
+
+            if (opt.getOptionType() == OptionType.JOYSTICK.getType()) {
+                JoystickOption joyStickOption = (JoystickOption) opt;
+                if (Objects.nonNull(playerEntity.getTransformComponent())) {
+                    processJoystick(playerEntity, joyStickOption);
+                }
+            }
         }
+    }
+
+    private void processJoystick(PlayerEntity playerEntity, JoystickOption joystickOption) {
+        JoystickComponent joystickComponent;
+        if (Objects.nonNull(playerEntity.getTransformComponent())) {
+            joystickComponent = playerEntity.getJoystickComponent();
+        } else {
+            joystickComponent = JoystickComponent.create();
+            playerEntity.setJoystickComponent(joystickComponent);
+        }
+        joystickComponent.setOpen(joystickOption.isOpen());
+        playerEntity.getTransformComponent().setEulerY(joystickOption.getCameraEulerY() + joystickOption.getDegree());
+        // 取消寻路
+        playerEntity.setaStarComponent(null);
     }
 
     private void processFindWay(PlayerEntity playerEntity, Easy3dNav easy3dNav, Vector3f point) {

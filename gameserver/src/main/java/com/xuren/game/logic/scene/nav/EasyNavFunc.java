@@ -1,5 +1,6 @@
 package com.xuren.game.logic.scene.nav;
 
+import org.recast4j.detour.QueryFilter;
 import org.recast4j.detour.extras.Vector3f;
 
 import java.util.List;
@@ -22,7 +23,11 @@ public interface EasyNavFunc {
 
     List<Vector3f> find(Vector3f start, Vector3f end, Vector3f extents);
 
+    float[] findPoint(float[] point);
+    Vector3f findPoint(Vector3f point);
 
+    float findHeight(float[] point);
+    float findHeight(Vector3f point);
     /**
      * 寻找路径
      *

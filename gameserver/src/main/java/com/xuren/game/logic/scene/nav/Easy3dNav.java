@@ -184,6 +184,39 @@ public class Easy3dNav implements EasyNavFunc{
         return paths.stream().map(p -> new Vector3f(p[0], p[1], p[2])).collect(Collectors.toList());
     }
 
+    @Override
+    public float[] findPoint(float[] point) {
+        Result<FindNearestPolyResult> r1 = query.findNearestPoly(point, extents, filter);
+        FindNearestPolyResult startResult = r1.result;
+        if (startResult.getNearestRef() == 0) {
+            LOGGER.info("point not found poly");
+            return null;
+        }
+        point[1] = query.getPolyHeight(startResult.getNearestRef(), point).result;
+        return point;
+    }
+
+    @Override
+    public Vector3f findPoint(Vector3f point) {
+        float[] arr = findPoint(v3fToFArr(point));
+        return new Vector3f(arr[0], arr[1], arr[2]);
+    }
+
+    @Override
+    public float findHeight(float[] point) {
+        Result<FindNearestPolyResult> r1 = query.findNearestPoly(point, extents, filter);
+        FindNearestPolyResult startResult = r1.result;
+        if (startResult.getNearestRef() == 0) {
+            LOGGER.info("point not found poly");
+            return 0;
+        }
+        return query.getPolyHeight(startResult.getNearestRef(), point).result;
+    }
+
+    @Override
+    public float findHeight(Vector3f point) {
+        return findHeight(v3fToFArr(point));
+    }
 
     public List<float[]> find(float[] start, float[] end) {
         return find(start, end, extents);
