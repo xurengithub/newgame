@@ -9,6 +9,8 @@ import com.xuren.game.logic.scene.nav.Easy3dNav;
 import com.xuren.game.logic.scene.utils.EulerUtils;
 import org.recast4j.detour.extras.Vector3f;
 
+import java.util.List;
+
 public abstract class JoystickSystem {
     public static void update(PlayerEntity playerEntity, Scene scene, Easy3dNav easy3dNav) {
         TransformComponent transformComponent = playerEntity.getTransformComponent();
@@ -20,7 +22,15 @@ public abstract class JoystickSystem {
         double z = distance * arr[1];
         pos.z += z;
         pos.x += x;
-        pos.y = easy3dNav.findHeight(pos);
-        Log.data.info("playerComponent:{}", JSON.toJSONString(pos));
+        if (pos.z > scene.getGridManager().getZ()) {
+            pos.z = scene.getGridManager().getZ();
+        }
+        if (pos.x > scene.getGridManager().getX()) {
+            pos.x = scene.getGridManager().getX();
+        }
+//        pos.y = easy3dNav.findHeight(pos);
+        Log.data.debug("playerComponent:{} x:{} z:{}", JSON.toJSONString(pos), x, z);
+        // todo 将位置同步给感兴趣的玩家
+        List<PlayerEntity> observerPlayers = scene.getGridManager().getObserverPlayers(playerEntity);
     }
 }

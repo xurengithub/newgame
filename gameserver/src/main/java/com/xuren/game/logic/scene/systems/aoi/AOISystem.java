@@ -16,9 +16,6 @@ public abstract class AOISystem {
             scene.getGridManager().removeObj(playerEntity);
             // 将角色加入新格子
             scene.getGridManager().addObj(playerEntity);
-        } else if (playerEntity.getGridX() == 0 && playerEntity.getGridZ() == 0){ // 防止角色进入场景所属的格子就是[0,0]
-            scene.getGridManager().removeObj(playerEntity);
-            scene.getGridManager().addObj(playerEntity);
         }
     }
 }

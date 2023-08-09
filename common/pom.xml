@@ -81,6 +81,20 @@
 <!--            <version>2.2.5.RELEASE</version>-->
 <!--        </dependency>-->
 
+        <!--slf4j 核心依赖-->
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-api</artifactId>-->
+<!--            <version>1.7.25</version>-->
+<!--        </dependency>-->
+
+        <!-- logback依赖  logback-classic依赖引入logback-core，则不需要单独引入-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

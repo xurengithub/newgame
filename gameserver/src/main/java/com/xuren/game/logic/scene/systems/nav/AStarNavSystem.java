@@ -17,7 +17,7 @@ public abstract class AStarNavSystem {
     public static boolean initAStarComponent(PlayerEntity playerEntity, Easy3dNav easy3dNav, Vector3f point) {
         Vector3f start = VectorUtils.cloneVector(playerEntity.getTransformComponent().getPosition());
         List<Vector3f> roads = easy3dNav.find(start, point);
-        Log.data.info("astar points:{}", JSON.toJSONString(roads));
+        Log.data.debug("astar points:{}", JSON.toJSONString(roads));
         if (CollectionUtils.isEmpty(roads)) {
             return false;
         }
@@ -56,7 +56,7 @@ public abstract class AStarNavSystem {
         aStarComponent.setVy(playerEntity.getTransformComponent().getSpeed() * dir.y / distance);
         aStarComponent.setVz(playerEntity.getTransformComponent().getSpeed() * dir.z / distance);
 
-        Log.data.info("walkNext aStarComponent:{}", JSON.toJSONString(aStarComponent));
+        Log.data.debug("walkNext aStarComponent:{}", JSON.toJSONString(aStarComponent));
 
         float degree = (float) (Math.atan2(dir.z, dir.x) * 180 / Math.PI);
         degree = 360 - degree;
@@ -75,7 +75,7 @@ public abstract class AStarNavSystem {
         pos.y += aStarComponent.getVy() * dt;
         pos.z += aStarComponent.getVz() * dt;
 
-        Log.data.info("playerComponent:{}", JSON.toJSONString(pos));
+        Log.data.debug("playerComponent:{}", JSON.toJSONString(pos));
         if (aStarComponent.getNowTime() >= aStarComponent.getTotalTime()) {
             aStarComponent.setNextStep(aStarComponent.getNextStep() + 1);
             walkToNext(playerEntity);

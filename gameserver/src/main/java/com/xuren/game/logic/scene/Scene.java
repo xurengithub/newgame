@@ -15,6 +15,7 @@ import com.xuren.game.logic.scene.systems.action.JoystickSystem;
 import com.xuren.game.logic.scene.systems.aoi.AOISystem;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
+import com.xuren.game.logic.scene.utils.VectorUtils;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
 
@@ -38,21 +39,30 @@ public class Scene {
 
     private Easy3dNav easy3dNav;
     private GridManager gridManager;
+    private Vector3f initPos;
+    private float initEulerY;
 
     public void init(String id, Easy3dNav easy3dNav, GridManager gridManager) {
         this.id = id;
         this.easy3dNav = easy3dNav;
         this.gridManager = gridManager;
+        this.initPos = new Vector3f(0, 0, 0);
+        this.initEulerY = 45;
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "game-loop-pool"));
         executor.scheduleAtFixedRate(this::gameLoop,0,  50, TimeUnit.MILLISECONDS);
     }
 
     public void enter(PlayerEntity playerEntity) {
+        Log.data.debug("player:{} enter scene", playerEntity.getRid());
         playerEntity.setSceneId(id);
+        playerEntity.getTransformComponent().setPosition(VectorUtils.cloneVector(initPos));
+        playerEntity.getTransformComponent().setEulerY(initEulerY);
+        playerEntity.setState(SceneState.IDLE);
         gridManager.addObj(playerEntity);
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
     }
+
     public void leave(String rid) {
         gridManager.removeObj(onlinePlayerMap.get(rid));
         onlinePlayerMap.remove(rid);
@@ -70,10 +80,14 @@ public class Scene {
         this.deltaTime = (this.deltaTimeMs / 1000.0f);
         this.prevTimeMs = curMs;
         onLogicUpdate();
+        Log.data.info("gameLoop time:{}", System.currentTimeMillis() - this.prevTimeMs);
     }
 
     private void onLogicUpdate() {
-        Log.data.info("logic update deltaTime:{} deltaTimeMs:{}", deltaTime, deltaTimeMs);
+        // 1.处理事件
+        // 2.处理迭代任务实体系统
+        // 3.迭代怪物系统
+//        Log.data.info("logic update deltaTime:{} deltaTimeMs:{}", deltaTime, deltaTimeMs);
         synchronized (queue) {
             for (SceneEvent event : queue) {
                 var playerEntity = getOnlinePlayer(event.getRid());
@@ -100,9 +114,6 @@ public class Scene {
                 AOISystem.update(playerEntity, this);
             }
         }
-        // 1.处理事件
-        // 2.处理迭代任务实体系统
-        // 3.迭代怪物系统
     }
 
     private void processEvent(PlayerEntity playerEntity, SceneEvent event) {
@@ -125,7 +136,7 @@ public class Scene {
 
     private void processJoystick(PlayerEntity playerEntity, JoystickOption joystickOption) {
         JoystickComponent joystickComponent;
-        if (Objects.nonNull(playerEntity.getTransformComponent())) {
+        if (Objects.nonNull(playerEntity.getJoystickComponent())) {
             joystickComponent = playerEntity.getJoystickComponent();
         } else {
             joystickComponent = JoystickComponent.create();
