@@ -2,7 +2,6 @@ package com.xuren.game.logic.scene;
 
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
-import com.xuren.game.logic.scene.components.AStarComponent;
 import com.xuren.game.logic.scene.components.JoystickComponent;
 import com.xuren.game.logic.scene.entities.MonsterEntity;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
@@ -13,6 +12,7 @@ import com.xuren.game.logic.scene.options.JoystickOption;
 import com.xuren.game.logic.scene.options.Option;
 import com.xuren.game.logic.scene.options.OptionType;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
+import com.xuren.game.logic.scene.systems.aoi.AOISystem;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
 import org.recast4j.detour.extras.Vector3f;
@@ -48,8 +48,14 @@ public class Scene {
         executor.scheduleAtFixedRate(this::gameLoop,0,  50, TimeUnit.MILLISECONDS);
     }
 
-    public void addPlayer(PlayerEntity playerEntity) {
+    public void enter(PlayerEntity playerEntity) {
+        playerEntity.setSceneId(id);
+        gridManager.addObj(playerEntity);
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
+    }
+    public void leave(String rid) {
+        gridManager.removeObj(onlinePlayerMap.get(rid));
+        onlinePlayerMap.remove(rid);
     }
 
     public void addSceneEvent(SceneEvent event) {
@@ -88,6 +94,10 @@ public class Scene {
 
             if (Objects.nonNull(playerEntity.getaStarComponent()) && Objects.nonNull(playerEntity.getTransformComponent())) {
                 AStarNavSystem.update(playerEntity, this);
+            }
+
+            if (Objects.nonNull(playerEntity.getTransformComponent())) {
+                AOISystem.update(playerEntity, this);
             }
         }
         // 1.处理事件
@@ -153,5 +163,9 @@ public class Scene {
 
     public String getId() {
         return id;
+    }
+
+    public GridManager getGridManager() {
+        return gridManager;
     }
 }

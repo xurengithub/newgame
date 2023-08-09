@@ -9,12 +9,17 @@ import com.xuren.game.logic.scene.systems.aoi.Grid;
 
 public class PlayerEntity {
     private String rid;
+    private JoystickComponent joystickComponent;
+    private HealthComponent healthComponent;
+
+    // region 场景相关
     private SceneState state;
     private TransformComponent transformComponent;
-    private JoystickComponent joystickComponent;
     private AStarComponent aStarComponent;
-    private HealthComponent healthComponent;
-    private Grid grid;
+    private int gridX;
+    private int gridZ;
+    private String sceneId;
+    // endregion
 
     public String getRid() {
         return rid;
@@ -64,11 +69,27 @@ public class PlayerEntity {
         this.healthComponent = healthComponent;
     }
 
-    public Grid getGrid() {
-        return grid;
+    public int getGridX() {
+        return gridX;
     }
 
-    public void setGrid(Grid grid) {
-        this.grid = grid;
+    public void setGridX(int gridX) {
+        this.gridX = gridX;
+    }
+
+    public int getGridZ() {
+        return gridZ;
+    }
+
+    public void setGridZ(int gridZ) {
+        this.gridZ = gridZ;
+    }
+
+    public String getSceneId() {
+        return sceneId;
+    }
+
+    public void setSceneId(String sceneId) {
+        this.sceneId = sceneId;
     }
 }

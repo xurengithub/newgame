@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 直管理格子内的内容
  * @author xuren
  */
 public class Grid {
     private final Map<String, PlayerEntity> playerEntityMap = new HashMap<>();
 
     public void addPlayer(PlayerEntity playerEntity) {
-        playerEntity.setGrid(playerEntity.getGrid());
         playerEntityMap.put(playerEntity.getRid(), playerEntity);
     }
 

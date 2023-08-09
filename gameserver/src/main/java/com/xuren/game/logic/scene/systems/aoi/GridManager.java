@@ -30,19 +30,34 @@ public class GridManager {
     }
 
     public void addObj(PlayerEntity playerEntity) {
-        Grid myGrid = queryGrid(playerEntity);
+        int[] gridPos = belongGridPos(playerEntity);
+        Grid myGrid = getGrid(gridPos[0], gridPos[1]);
+        playerEntity.setGridX(gridPos[0]);
+        playerEntity.setGridZ(gridPos[1]);
         myGrid.addPlayer(playerEntity);
     }
 
     public void removeObj(PlayerEntity playerEntity) {
-        playerEntity.getGrid().removePlayer(playerEntity);
-        playerEntity.setGrid(null);
+        playerEntity.setGridX(0);
+        playerEntity.setGridZ(0);
+        grids[playerEntity.getGridX()][playerEntity.getGridZ()].removePlayer(playerEntity);
     }
 
-    private Grid queryGrid(PlayerEntity playerEntity) {
+    public Grid belongGrid(PlayerEntity playerEntity) {
         Vector3f pos = playerEntity.getTransformComponent().getPosition();
         int gridX = (int) Math.ceil(pos.x / blockSize);
         int gridZ = (int) Math.ceil(pos.z / blockSize);
         return grids[gridX][gridZ];
+    }
+
+    public int[] belongGridPos(PlayerEntity playerEntity) {
+        Vector3f pos = playerEntity.getTransformComponent().getPosition();
+        int gridX = (int) Math.ceil(pos.x / blockSize);
+        int gridZ = (int) Math.ceil(pos.z / blockSize);
+        return new int[] {gridX, gridZ};
+    }
+
+    public Grid getGrid(int x, int z) {
+        return grids[x][z];
     }
 }
