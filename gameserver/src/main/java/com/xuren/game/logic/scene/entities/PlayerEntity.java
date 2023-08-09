@@ -5,6 +5,7 @@ import com.xuren.game.logic.scene.components.AStarComponent;
 import com.xuren.game.logic.scene.components.HealthComponent;
 import com.xuren.game.logic.scene.components.JoystickComponent;
 import com.xuren.game.logic.scene.components.TransformComponent;
+import com.xuren.game.logic.scene.systems.aoi.Grid;
 
 public class PlayerEntity {
     private String rid;
@@ -13,6 +14,7 @@ public class PlayerEntity {
     private JoystickComponent joystickComponent;
     private AStarComponent aStarComponent;
     private HealthComponent healthComponent;
+    private Grid grid;
 
     public String getRid() {
         return rid;
@@ -60,5 +62,13 @@ public class PlayerEntity {
 
     public void setHealthComponent(HealthComponent healthComponent) {
         this.healthComponent = healthComponent;
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
     }
 }

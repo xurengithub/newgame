@@ -1,4 +1,4 @@
-package com.xuren.game.logic.scene;
+package not_unit;
 
 import com.xuren.game.logic.scene.nav.Easy3dNav;
 

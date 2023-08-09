@@ -13,6 +13,7 @@ import com.xuren.game.logic.scene.options.JoystickOption;
 import com.xuren.game.logic.scene.options.Option;
 import com.xuren.game.logic.scene.options.OptionType;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
+import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
@@ -36,10 +37,12 @@ public class Scene {
     private Map<Integer, MonsterEntity> monsterMap = Maps.newHashMap();
 
     private Easy3dNav easy3dNav;
+    private GridManager gridManager;
 
-    public void init(String id, Easy3dNav easy3dNav) {
+    public void init(String id, Easy3dNav easy3dNav, GridManager gridManager) {
         this.id = id;
         this.easy3dNav = easy3dNav;
+        this.gridManager = gridManager;
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "game-loop-pool"));
         executor.scheduleAtFixedRate(this::gameLoop,0,  50, TimeUnit.MILLISECONDS);
@@ -146,5 +149,9 @@ public class Scene {
 
     public Map<String, PlayerEntity> getOnlinePlayerMap() {
         return onlinePlayerMap;
+    }
+
+    public String getId() {
+        return id;
     }
 }

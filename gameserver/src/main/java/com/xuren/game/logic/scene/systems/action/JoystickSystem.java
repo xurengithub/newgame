@@ -9,7 +9,7 @@ import com.xuren.game.logic.scene.nav.Easy3dNav;
 import com.xuren.game.logic.scene.utils.EulerUtils;
 import org.recast4j.detour.extras.Vector3f;
 
-public class JoystickSystem {
+public abstract class JoystickSystem {
     public static void update(PlayerEntity playerEntity, Scene scene, Easy3dNav easy3dNav) {
         TransformComponent transformComponent = playerEntity.getTransformComponent();
         Vector3f pos = transformComponent.getPosition();

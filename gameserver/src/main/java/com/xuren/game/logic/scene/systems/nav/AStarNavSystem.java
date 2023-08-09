@@ -13,7 +13,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-public class AStarNavSystem {
+public abstract class AStarNavSystem {
     public static boolean initAStarComponent(PlayerEntity playerEntity, Easy3dNav easy3dNav, Vector3f point) {
         Vector3f start = VectorUtils.cloneVector(playerEntity.getTransformComponent().getPosition());
         List<Vector3f> roads = easy3dNav.find(start, point);
