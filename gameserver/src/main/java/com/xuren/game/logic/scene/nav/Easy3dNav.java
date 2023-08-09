@@ -162,13 +162,17 @@ public class Easy3dNav implements EasyNavFunc{
         //获取路径ids
         Result<List<Long>> path = query.findPath(startResult.getNearestRef(), endResult.getNearestRef(), startResult.getNearestPos(), endResult.getNearestPos(), filter);
 
-//        if (path.getStatus() != Status.SUCCSESS) {
-//            LOGGER.info("nav path  status is  {}", path.getStatus());
-//            return Collections.emptyList();
-//        }
+        if (!path.succeeded()) {
+            LOGGER.info("nav path  status is  {}", path.status);
+            return Collections.emptyList();
+        }
 
         //路径平滑
         Result<List<StraightPathItem>> straightPathResult = query.findStraightPath(startResult.getNearestPos(), endResult.getNearestPos(), path.result, Integer.MAX_VALUE, 0);
+        if (!straightPathResult.succeeded()) {
+            LOGGER.info("straightPathResult path  status is  {}", straightPathResult.status);
+            return Collections.emptyList();
+        }
         List<StraightPathItem> straightPath = straightPathResult.result;
         for (StraightPathItem straightPathItem : straightPath) {
             float[] p = new float[3];
@@ -187,12 +191,21 @@ public class Easy3dNav implements EasyNavFunc{
     @Override
     public float[] findPoint(float[] point) {
         Result<FindNearestPolyResult> r1 = query.findNearestPoly(point, extents, filter);
+        if (!r1.succeeded()) {
+            LOGGER.info("find point error, status:{}", r1.status);
+            return null;
+        }
         FindNearestPolyResult startResult = r1.result;
         if (startResult.getNearestRef() == 0) {
             LOGGER.info("point not found poly");
             return null;
         }
-        point[1] = query.getPolyHeight(startResult.getNearestRef(), point).result;
+        Result<Float> r2 = query.getPolyHeight(startResult.getNearestRef(), point);
+        if (!r2.succeeded()) {
+            LOGGER.info("getPolyHeight error, status:{}", r2.status);
+            return null;
+        }
+        point[1] = r2.result;
         return point;
     }
 
@@ -238,6 +251,9 @@ public class Easy3dNav implements EasyNavFunc{
         float[] hitPoint = null;
 
         Result<RaycastHit> r2 = query.raycast(startResult.getNearestRef(), startResult.getNearestPos(), end, filter, 0, 0);
+        if (!r2.succeeded()) {
+            throw new IllegalArgumentException("raycast error");
+        }
         RaycastHit hitReasult = r2.result;
         if (hitReasult.t > 1) {
             return end;
@@ -270,6 +286,9 @@ public class Easy3dNav implements EasyNavFunc{
     @Override
     public float[] findNearest(float[] point) {
         Result<FindNearestPolyResult> result = query.findNearestPoly(point, extents, filter);
+        if (!result.succeeded()) {
+            throw new IllegalArgumentException("findNearest error");
+        }
         return result.result.getNearestPos();
     }
 
@@ -283,6 +302,9 @@ public class Easy3dNav implements EasyNavFunc{
     @Override
     public float[] findNearest(float[] point, float[] extents) {
         Result<FindNearestPolyResult> result = query.findNearestPoly(point, extents, filter);
+        if (!result.succeeded()) {
+            throw new IllegalArgumentException("findNearest error");
+        }
         return result.result.getNearestPos();
     }
 

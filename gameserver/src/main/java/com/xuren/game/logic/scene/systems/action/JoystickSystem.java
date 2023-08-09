@@ -6,6 +6,7 @@ import com.xuren.game.logic.scene.Scene;
 import com.xuren.game.logic.scene.components.TransformComponent;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
+import com.xuren.game.logic.scene.utils.EulerUtils;
 import org.recast4j.detour.extras.Vector3f;
 
 public class JoystickSystem {
@@ -14,8 +15,9 @@ public class JoystickSystem {
         Vector3f pos = transformComponent.getPosition();
 
         float distance = scene.deltaTime * transformComponent.getSpeed();
-        double x = distance * Math.sin(transformComponent.getEulerY());
-        double z = distance * Math.cos(transformComponent.getEulerY());
+        double[] arr = EulerUtils.fromDegree(transformComponent.getEulerY());
+        double x = distance * arr[0];
+        double z = distance * arr[1];
         pos.z += z;
         pos.x += x;
         pos.y = easy3dNav.findHeight(pos);
