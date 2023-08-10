@@ -23,21 +23,21 @@
     </appender>
 
     <!--输出到文件-->
-    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/out.log</file>
-<!--        TimeBasedRollingPolicy-->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/%d{yyyy-MM-dd,aux}/out.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-            <maxFileSize>100MB</maxFileSize>
-            <totalSizeCap>1GB</totalSizeCap>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
-        <encoder>
-            <!--格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符-->
-<!--            <pattern>文件记录-%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
+<!--    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--        <file>${log.path}/out.log</file>-->
+<!--&lt;!&ndash;        TimeBasedRollingPolicy&ndash;&gt;-->
+<!--        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+<!--            <fileNamePattern>${log.path}/%d{yyyy-MM-dd,aux}/out.%d{yyyy-MM-dd}-%i.log</fileNamePattern>-->
+<!--            <maxHistory>30</maxHistory>-->
+<!--            <maxFileSize>100MB</maxFileSize>-->
+<!--            <totalSizeCap>1GB</totalSizeCap>-->
+<!--            <cleanHistoryOnStart>true</cleanHistoryOnStart>-->
+<!--        </rollingPolicy>-->
+<!--        <encoder>-->
+<!--            &lt;!&ndash;格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符&ndash;&gt;-->
+<!--&lt;!&ndash;            <pattern>文件记录-%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>&ndash;&gt;-->
+<!--            <pattern>${FILE_LOG_PATTERN}</pattern>-->
+<!--            <charset>UTF-8</charset>-->
+<!--        </encoder>-->
+<!--    </appender>-->
 </included>
