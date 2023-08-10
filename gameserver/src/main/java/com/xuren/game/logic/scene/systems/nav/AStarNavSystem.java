@@ -41,8 +41,6 @@ public abstract class AStarNavSystem {
         Vector3f nextPoint = playerEntity.getaStarComponent().getRoadPoints().get(playerEntity.getaStarComponent().getNextStep());
         Vector3f dir = VectorUtils.sub(nextPoint, currentPoint);
 
-
-
         float distance = (float) VectorUtils.distance(currentPoint, nextPoint);
         if (distance <= 0) {
             aStarComponent.setNextStep(aStarComponent.getNextStep() + 1);
@@ -74,6 +72,11 @@ public abstract class AStarNavSystem {
         pos.x += aStarComponent.getVx() * dt;
         pos.y += aStarComponent.getVy() * dt;
         pos.z += aStarComponent.getVz() * dt;
+
+        // todo 将位置同步给感兴趣的玩家
+        List<PlayerEntity> observerPlayers = scene.getGridManager().getCurrObserverPlayers(playerEntity);
+
+        // todo 剩余的时间走不走呢
 
         Log.data.debug("playerComponent:{}", JSON.toJSONString(pos));
         if (aStarComponent.getNowTime() >= aStarComponent.getTotalTime()) {

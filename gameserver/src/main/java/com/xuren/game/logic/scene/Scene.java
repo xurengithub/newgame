@@ -60,10 +60,15 @@ public class Scene {
         playerEntity.getTransformComponent().setEulerY(initEulerY);
         playerEntity.setState(SceneState.IDLE);
         gridManager.addObj(playerEntity);
+
+        // todo   通知这些人自己进来了
+        gridManager.getCurrObserverPlayers(playerEntity);
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
     }
 
     public void leave(String rid) {
+        // todo   通知这些人自己离开了
+        gridManager.getCurrObserverPlayers(onlinePlayerMap.get(rid));
         gridManager.removeObj(onlinePlayerMap.get(rid));
         onlinePlayerMap.remove(rid);
     }
