@@ -29,7 +29,7 @@ public abstract class SceneManager {
     private static Scene initS1() throws IOException {
         Easy3dNav easy3dNav = new Easy3dNav();
         easy3dNav.setPrintMeshInfo(true);
-        easy3dNav.init("Terrain6.obj");
+        easy3dNav.init("dungeon.obj");
 
         GridManager gridManager = new GridManager(1000, 1000, 100);
         Scene scene = new Scene();
