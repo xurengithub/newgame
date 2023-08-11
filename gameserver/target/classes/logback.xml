@@ -2,6 +2,6 @@
 
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <property name="log.template" value="${log.template:-console}"/>
-    <property name="log.level" value="${log.level:-info}"/>
+    <property name="log.level" value="${log.level:-debug}"/>
     <include resource="logback/logback-${log.template}.xml"/>
 </configuration>
