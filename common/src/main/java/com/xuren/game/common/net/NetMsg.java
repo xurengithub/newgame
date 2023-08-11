@@ -83,5 +83,6 @@ public class NetMsg implements Cleanable {
         msgCode = -1;
         requestId = -1;
         rid = null;
+        version = "";
     }
 }
