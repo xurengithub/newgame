@@ -1,5 +1,7 @@
 package com.xuren.game.common.net.tcp;
 
+import com.alibaba.fastjson.JSON;
+import com.xuren.game.common.log.Log;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -33,10 +35,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Packet packet = (Packet)msg;
+        Log.data.info("server receive:{}", JSON.toJSONString(msg));
         Channel channel = ref.get(ctx.channel());
-        
-//        ProtoManager.handleProto(packet, channel);
+        channel.writeAndFlush(msg);
     }
     
     @Override

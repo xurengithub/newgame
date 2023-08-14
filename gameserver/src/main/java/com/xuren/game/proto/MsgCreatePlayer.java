@@ -1,6 +1,7 @@
 package com.xuren.game.proto;
 
 
+import com.xuren.game.common.proto.MsgBase;
 import com.xuren.game.model.player.PlayerEntity;
 
 public class MsgCreatePlayer extends MsgBase {

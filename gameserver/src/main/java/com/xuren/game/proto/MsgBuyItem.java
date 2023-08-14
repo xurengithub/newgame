@@ -1,5 +1,7 @@
 package com.xuren.game.proto;
 
+import com.xuren.game.common.proto.MsgBase;
+
 public class MsgBuyItem extends MsgBase {
     private int result;
     private int itemId;

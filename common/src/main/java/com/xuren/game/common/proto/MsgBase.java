@@ -1,8 +1,9 @@
-package com.xuren.game.proto;
+package com.xuren.game.common.proto;
 
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.xuren.game.common.utils.ServNetUtils;
 
 public class MsgBase {
@@ -20,6 +21,11 @@ public class MsgBase {
         String s = new String(bytes, offset, count);
         MsgBase msgBase = JSONObject.parseObject(s, MsgBase.class);
         return msgBase;
+    }
+
+    public static MsgBase decode(byte[] bytes) {
+        return JSONObject.parseObject(new String(bytes), MsgBase.class);
+//        return JSONObject.parseObject(bytes, MsgBase.class, Feature.values());
     }
 
     //编码协议名（2字节长度+字符串）

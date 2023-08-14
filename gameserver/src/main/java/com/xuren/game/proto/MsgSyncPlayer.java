@@ -1,6 +1,8 @@
 package com.xuren.game.proto;
 
-public class MsgSyncPlayer extends MsgBase{
+import com.xuren.game.common.proto.MsgBase;
+
+public class MsgSyncPlayer extends MsgBase {
     private long playerId;
     private float x;
     private float y;

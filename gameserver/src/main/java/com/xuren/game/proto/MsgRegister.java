@@ -1,5 +1,7 @@
 package com.xuren.game.proto;
 
+import com.xuren.game.common.proto.MsgBase;
+
 public class MsgRegister extends MsgBase {
 	public MsgRegister() {protoName = "MsgRegister";}
 	//客户端发

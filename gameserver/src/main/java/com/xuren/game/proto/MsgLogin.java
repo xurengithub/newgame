@@ -1,6 +1,8 @@
 package com.xuren.game.proto;
 
-public class MsgLogin extends MsgBase{
+import com.xuren.game.common.proto.MsgBase;
+
+public class MsgLogin extends MsgBase {
     public MsgLogin() {protoName = "MsgLogin";}
     //客户端发
     private String id = "";
