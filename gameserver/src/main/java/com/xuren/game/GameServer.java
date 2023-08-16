@@ -15,12 +15,22 @@ import java.io.IOException;
 public class GameServer {
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
-        initProperties();
+        initProtoHandler();
         initZK();
+        initProperties();
         initScene();
         initNet();
     }
 
+    /**
+     * 初始化协议处理器
+     */
+    private static void initProtoHandler() {
+    }
+
+    /**
+     * 初始化场景
+     */
     private static void initScene() {
         try {
             SceneManager.initScene();
@@ -29,6 +39,9 @@ public class GameServer {
         }
     }
 
+    /**
+     * 初始化网络
+     */
     private static void initNet() {
         NettyTcpServer nettyTcpServer = new NettyTcpServer();
         nettyTcpServer.bind("127.0.0.1", 55667);
@@ -41,7 +54,11 @@ public class GameServer {
     }
 
     private static void initProperties() {
-
+        // todo 初始化属性系统
+        // 希望先加载.properties文件
+        // 然后程序—D的属性
+        // zk
+        // zk > -D > .properties
     }
 
 }
