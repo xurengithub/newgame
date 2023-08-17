@@ -8,8 +8,8 @@ import com.xuren.game.common.proto.Interface;
  */
 @ProtoHandler(module = 10000)
 public class PlayerHandler {
-    @Interface(code = 10001, desc = "dddd")
-    public void login() {
+    @Interface(code = 10001, desc = "登陆接口")
+    public void login(String rid, CommonParams commonParams) {
 
     }
 }
