@@ -1,15 +1,11 @@
 package com.xuren.game.common.net.tcp.newgame;
 
-import com.alibaba.fastjson.JSON;
-import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.INetChannel;
-import com.xuren.game.common.net.KcpNetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.TcpNetChannel;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import com.xuren.game.common.net.tcp.ServerHandler;
-import com.xuren.game.common.proto.MsgBase;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -60,7 +56,7 @@ public class Server2Handler extends SimpleChannelInboundHandler<NetMsg> {
             return;
         }
 
-        dispatch(msg);
+        decode(msg);
         ctx.fireChannelRead(msg);
     }
 
@@ -98,7 +94,7 @@ public class Server2Handler extends SimpleChannelInboundHandler<NetMsg> {
         }
     }
 
-    private void dispatch(NetMsg msg) {
+    private void decode(NetMsg msg) {
 
         TypeEnum typeEnum = msg.getType();
         switch (typeEnum) {
@@ -129,7 +125,8 @@ public class Server2Handler extends SimpleChannelInboundHandler<NetMsg> {
         switch (packageTypeEnum) {
             case REQUEST: request(msg, bf);
                 break;
-//            case SCENE_EVENT: scene(msg, bf);
+            case SCENE_EVENT: request(msg, bf);
+                break;
         }
     }
 
@@ -141,13 +138,21 @@ public class Server2Handler extends SimpleChannelInboundHandler<NetMsg> {
         msg.setRequestId(requestId);
         msg.setMsgCode(opCode);
 
+        // 版本号
+        int versionLength = bf.readByte();
+        byte[] versionData = new byte[versionLength];
+        bf.readBytes(versionData);
+        String version = new String(versionData);
+        msg.setVersion(version);
+
+        // rid
         int ridLength = bf.readByte();
         byte[] ridData = new byte[ridLength];
         bf.readBytes(ridData);
         String rid = new String(ridData);
         msg.setRid(rid);
 
-        int surplusDataLength = dataLength - 1 - ridLength;
+        int surplusDataLength = dataLength - 1 - ridLength - 1 - versionLength;
         byte[] d = new byte[surplusDataLength];
         bf.readBytes(d);
         msg.setData(d);
