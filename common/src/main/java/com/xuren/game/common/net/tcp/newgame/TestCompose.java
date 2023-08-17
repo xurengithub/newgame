@@ -3,6 +3,7 @@ package com.xuren.game.common.net.tcp.newgame;
 import com.xuren.game.common.log.Log;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
 /**
@@ -23,10 +24,25 @@ public class TestCompose {
             Log.data.info("r2");
         };
         var f2 = CompletableFuture.runAsync(r2, forkJoinPool);
-        f2.thenCompose(v -> {
-            return CompletableFuture.runAsync(r1);
+//        f2.thenCompose(v -> {
+//            return CompletableFuture.runAsync(r1);
+//        });
+        f2.thenComposeAsync(v -> {
+            Log.data.info("ddd");
+            return CompletableFuture.runAsync(r1, new Executor() {
+                @Override
+                public void execute(Runnable command) {
+                    Thread thread = new Thread(command);
+                    thread.start();
+                }
+            });
+        }, new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                Thread thread = new Thread(command);
+                thread.start();
+            }
         });
-
 //        f2.thenCombine(CompletableFuture.runAsync(r1, forkJoinPool), (v1,v2) -> {
 //            Log.data.info("combine");
 //            return 1;
