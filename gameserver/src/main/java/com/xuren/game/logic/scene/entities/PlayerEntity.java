@@ -6,18 +6,24 @@ import com.xuren.game.logic.scene.components.HealthComponent;
 import com.xuren.game.logic.scene.components.JoystickComponent;
 import com.xuren.game.logic.scene.components.TransformComponent;
 import com.xuren.game.logic.scene.systems.aoi.Grid;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document("role")
 public class PlayerEntity {
+    @Id
     private String rid;
+    @Transient
     private JoystickComponent joystickComponent;
     private HealthComponent healthComponent;
 
     // region 场景相关
+    @Transient
     private SceneState state;
     private TransformComponent transformComponent;
+    @Transient
     private AStarComponent aStarComponent;
-    private int gridX;
-    private int gridZ;
     private String sceneId;
     // endregion
 
@@ -67,22 +73,6 @@ public class PlayerEntity {
 
     public void setHealthComponent(HealthComponent healthComponent) {
         this.healthComponent = healthComponent;
-    }
-
-    public int getGridX() {
-        return gridX;
-    }
-
-    public void setGridX(int gridX) {
-        this.gridX = gridX;
-    }
-
-    public int getGridZ() {
-        return gridZ;
-    }
-
-    public void setGridZ(int gridZ) {
-        this.gridZ = gridZ;
     }
 
     public String getSceneId() {

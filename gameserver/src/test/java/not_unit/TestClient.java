@@ -6,7 +6,6 @@ import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import com.xuren.game.common.net.tcp.client.NettyTcpClient;
-import com.xuren.game.common.proto.MsgBase;
 
 /**
  * @author xuren

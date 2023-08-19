@@ -54,7 +54,6 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
         int moduleCode = msg.getMsgCode() / 10000;
         Object handler = ProtoHandlerManager.getHandler(moduleCode);
         MethodHandler methodHandler = ProtoHandlerManager.getInterface(msg.getMsgCode());
-
         LogicExecutors.orderExecutor.compose(msg.getRid(), () -> {
             Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), msg.getRid(), JSONObject.parseObject(new String(msg.getData()), methodHandler.getParamType()));
             CompletionStage<Object> future;

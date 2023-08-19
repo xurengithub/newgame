@@ -6,7 +6,6 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * @author xuren
@@ -22,7 +21,6 @@ public class ZKClient {
             .sessionTimeoutMs(zkConfig.getSessionTimeoutMs())
             .namespace(zkConfig.getNamespace())
             .build();
-        registerNode();
     }
 
     public CuratorFramework getCuratorFramework() {

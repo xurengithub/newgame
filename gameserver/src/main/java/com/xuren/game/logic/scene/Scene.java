@@ -3,7 +3,6 @@ package com.xuren.game.logic.scene;
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.logic.scene.components.JoystickComponent;
-import com.xuren.game.logic.scene.entities.MonsterEntity;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.events.SceneEvent;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
@@ -35,7 +34,7 @@ public class Scene {
 
     private Map<String, PlayerEntity> onlinePlayerMap = Maps.newHashMap();
 
-    private Map<Integer, MonsterEntity> monsterMap = Maps.newHashMap();
+//    private Map<Integer, MonsterEntity> monsterMap = Maps.newHashMap();
 
     private Easy3dNav easy3dNav;
     private GridManager gridManager;

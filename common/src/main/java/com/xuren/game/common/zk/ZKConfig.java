@@ -12,6 +12,10 @@ public class ZKConfig {
     private int sessionTimeoutMs = 60000;
     private int connectionTimeoutMs = 5000;
     private String namespace = "game";
+    public static final ZKConfig instance = new ZKConfig();
+    private ZKConfig() {
+
+    }
 
     public int getRetryCount() {
         return retryCount;
