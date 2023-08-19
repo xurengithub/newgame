@@ -13,8 +13,8 @@ import java.util.function.Supplier;
  * @author xuren
  */
 public class OrderExecutor implements Executor {
-    private ExecutorService executorService;
-    private Map<String, CompletableFuture<?>> resultMap = new HashMap<>();
+    private final ExecutorService executorService;
+    private static final Map<String, CompletableFuture<?>> resultMap = new HashMap<>();
 
     public OrderExecutor(ExecutorService executorService) {
         this.executorService = executorService;
@@ -25,7 +25,16 @@ public class OrderExecutor implements Executor {
         executorService.execute(command);
     }
 
-    public void submit(String orderKey, Supplier<CompletableFuture<?>> supplier) {
-//        CompletableFuture.supplyAsync();
+    public <T> CompletableFuture<T> compose(String key, Supplier<CompletableFuture<T>> supplier) {
+        var future = resultMap.compute(key, (k, f) -> f == null ? CompletableFuture.runAsync(() -> {}).thenCompose(v -> supplier.get()) : f.thenCompose(v -> supplier.get()));
+        if (future == null) {
+            var newFuture = CompletableFuture.runAsync(() -> {}).thenCompose(v -> supplier.get());
+            resultMap.put(key, newFuture);
+            return newFuture;
+        } else {
+            var newFuture = future.thenCompose(v -> supplier.get());
+            resultMap.put(key, newFuture);
+            return newFuture;
+        }
     }
 }

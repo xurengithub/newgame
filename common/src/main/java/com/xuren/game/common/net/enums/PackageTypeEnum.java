@@ -8,6 +8,7 @@ import java.util.HashMap;
 public enum PackageTypeEnum {
     REQUEST(0x00),
     SCENE_EVENT(0x01),
+    RESPONSE(0x02),
         ;
 
     private byte key;

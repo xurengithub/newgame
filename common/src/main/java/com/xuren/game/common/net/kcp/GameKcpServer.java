@@ -88,13 +88,19 @@ public class GameKcpServer extends KcpServer {
         msg.setRequestId(requestId);
         msg.setMsgCode(opCode);
 
+        int versionLength = bf.readByte();
+        byte[] versionData = new byte[versionLength];
+        bf.readBytes(versionData);
+        String version = new String(versionData);
+        msg.setVersion(version);
+
         int ridLength = bf.readByte();
         byte[] ridData = new byte[ridLength];
         bf.readBytes(ridData);
         String rid = new String(ridData);
         msg.setRid(rid);
 
-        int surplusDataLength = dataLength - 1 - ridLength;
+        int surplusDataLength = dataLength - 1 - ridLength - 1 - versionLength;
         byte[] d = new byte[surplusDataLength];
         bf.readBytes(d);
         msg.setData(d);

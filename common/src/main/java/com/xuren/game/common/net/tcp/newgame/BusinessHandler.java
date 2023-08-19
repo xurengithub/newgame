@@ -1,7 +1,11 @@
 package com.xuren.game.common.net.tcp.newgame;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.xuren.game.common.excecutor.LogicExecutors;
 import com.xuren.game.common.net.NetChannel;
 import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import com.xuren.game.common.proto.MethodHandler;
@@ -9,12 +13,10 @@ import com.xuren.game.common.proto.ProtoHandlerManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.util.StringUtils;
-import org.testng.collections.Maps;
 
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.Function;
+import java.util.concurrent.CompletionStage;
 
 /**
  * @author xuren
@@ -26,8 +28,10 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
         if (msg.getType() == TypeEnum.DATA) {
             if (msg.getPackageTypeEnum() == PackageTypeEnum.REQUEST) {
                 execute(netChannel, msg);
-            } else {
+            } else if (msg.getPackageTypeEnum() == PackageTypeEnum.SCENE_EVENT) {
                 scene(netChannel, msg);
+            } else {
+                throw new IllegalStateException("illegal packageType");
             }
         }
     }
@@ -48,5 +52,33 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
         int moduleCode = msg.getMsgCode() / 10000;
         Object handler = ProtoHandlerManager.getHandler(moduleCode);
         MethodHandler methodHandler = ProtoHandlerManager.getInterface(msg.getMsgCode());
+        LogicExecutors.orderExecutor.compose(msg.getRid(), () -> {
+            Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), methodHandler.getParamType());
+            CompletionStage<Object> future;
+            if (CompletionStage.class.isAssignableFrom(methodHandler.getMethod().getReturnType())) {
+                future = (CompletionStage<Object>) returnValue;
+            } else {
+                future = CompletableFuture.completedStage(returnValue);
+            }
+            return future.thenAccept(obj -> {
+                // todo  存储，并且将响应发到端
+                NetMsg responseNetMsg = NetUtils.buildResponseMsg(msg.getMsgCode(), msg.getRequestId(), encode(obj));
+                netChannel.sendMsg(responseNetMsg);
+            }).toCompletableFuture();
+        });
+    }
+
+    private static byte[] encode(Object content) {
+        if (content instanceof byte[]) {
+            return (byte[]) content;
+        } else if (content instanceof CharSequence) {
+            return ((CharSequence) content).toString().getBytes(StandardCharsets.UTF_8);
+        } else {
+            return JSON.toJSONString(
+                content,
+                // 使fastjson序列化逻辑符合json标准
+                SerializerFeature.DisableCircularReferenceDetect, SerializerFeature.WriteNonStringKeyAsString
+            ).getBytes(StandardCharsets.UTF_8);
+        }
     }
 }

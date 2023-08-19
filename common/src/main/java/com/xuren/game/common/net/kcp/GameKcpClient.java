@@ -60,6 +60,7 @@ public class GameKcpClient extends KcpClient {
         msg.setType(TypeEnum.INIT);
         msg.setPackageTypeEnum(PackageTypeEnum.REQUEST);
         msg.setRequestId(1);
+        msg.setVersion("1");
         tc.send(NetUtils.buildRequest(msg));
 
 
@@ -70,7 +71,8 @@ public class GameKcpClient extends KcpClient {
         msg2.setType(TypeEnum.DATA);
         msg2.setPackageTypeEnum(PackageTypeEnum.REQUEST);
         msg2.setRequestId(1);
-        tc.send(NetUtils.buildRequest(msg));
+        msg2.setVersion("1");
+        tc.send(NetUtils.buildRequest(msg2));
 
     }
 
