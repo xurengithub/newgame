@@ -1,4 +1,4 @@
-package com.xuren.game.common.net.tcp;
+package com.xuren.game.common.net.tcp.server;
 
 import com.alibaba.fastjson.JSON;
 import com.xuren.game.common.log.Log;

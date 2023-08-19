@@ -1,6 +1,7 @@
-package com.xuren.game.common.net.tcp.newgame;
+package com.xuren.game.common.net.tcp.codec.newgame;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xuren.game.common.excecutor.LogicExecutors;
 import com.xuren.game.common.net.NetChannel;
@@ -14,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -46,14 +48,15 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
     private void execute(NetChannel netChannel, NetMsg msg) {
         // 如果是登陆游戏
         // 如果角色有场景则加入场景指定地点，如果角色没有过场景则加入初始场景@
-        if (StringUtils.hasText(msg.getRid())) {
+        if (!StringUtils.hasText(msg.getRid())) {
             throw new IllegalStateException("netMsg has not rid");
         }
         int moduleCode = msg.getMsgCode() / 10000;
         Object handler = ProtoHandlerManager.getHandler(moduleCode);
         MethodHandler methodHandler = ProtoHandlerManager.getInterface(msg.getMsgCode());
+
         LogicExecutors.orderExecutor.compose(msg.getRid(), () -> {
-            Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), methodHandler.getParamType());
+            Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), msg.getRid(), JSONObject.parseObject(new String(msg.getData()), methodHandler.getParamType()));
             CompletionStage<Object> future;
             if (CompletionStage.class.isAssignableFrom(methodHandler.getMethod().getReturnType())) {
                 future = (CompletionStage<Object>) returnValue;

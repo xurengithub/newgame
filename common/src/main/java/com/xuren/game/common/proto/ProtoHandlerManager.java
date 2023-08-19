@@ -22,7 +22,7 @@ public class ProtoHandlerManager {
         Set<Class<?>> classSet = new HashSet<>();
         for (String packageName : packages) {
             Reflections reflections = new Reflections(packageName);
-            classSet.containsAll(reflections.getTypesAnnotatedWith(ProtoHandler.class));
+            classSet.addAll(reflections.getTypesAnnotatedWith(ProtoHandler.class));
         }
 
         for (Class<?> clazz : classSet) {
@@ -32,7 +32,7 @@ public class ProtoHandlerManager {
                 throw new RuntimeException("repeat processor with moduleCode: " + moduleCode + ", processor: " + clazz.getName());
             }
             try {
-                handlerMap.put(protoHandler.module(), clazz.newInstance());
+                handlerMap.put(protoHandler.module()/10000, clazz.newInstance());
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {

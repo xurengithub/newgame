@@ -1,4 +1,4 @@
-package com.xuren.game.handler;
+package com.xuren.game.handler.params;
 
 /**
  * @author xuren

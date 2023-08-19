@@ -1,7 +1,10 @@
-package com.xuren.game.common.net.tcp;
+package com.xuren.game.common.net.tcp.client;
 
-import com.xuren.game.common.net.tcp.oldgame.ProtoDecoder2;
-import com.xuren.game.common.net.tcp.oldgame.ProtoEncoder2;
+import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.tcp.codec.newgame.ProtoDecoder3;
+import com.xuren.game.common.net.tcp.codec.newgame.ProtoEncoder3;
+import com.xuren.game.common.net.tcp.codec.oldgame.ProtoDecoder2;
+import com.xuren.game.common.net.tcp.codec.oldgame.ProtoEncoder2;
 import com.xuren.game.common.proto.MsgBase;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -31,8 +34,8 @@ public class NettyTcpClient {
 			@Override
 			protected void initChannel(Channel ch) throws Exception {
 				ChannelPipeline pipeline = ch.pipeline();
-				pipeline.addLast("decoder", new ProtoDecoder2());
-				pipeline.addLast("encoder", new ProtoEncoder2());
+				pipeline.addLast("decoder", new ProtoDecoder3());
+				pipeline.addLast("encoder", new ClientEncoder3());
 				pipeline.addLast("serverHandler", new ClientHandler());
 			}
 		});
@@ -47,7 +50,7 @@ public class NettyTcpClient {
 		//future.channel().closeFuture().awaitUninterruptibly();
 	}
 	
-	public void send(MsgBase msg) {
+	public void send(NetMsg msg) {
 		if (channel == null || msg == null || !channel.isWritable()) {
 			return;
 		}

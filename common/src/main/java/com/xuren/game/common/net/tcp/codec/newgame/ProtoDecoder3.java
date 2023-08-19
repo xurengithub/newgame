@@ -1,22 +1,13 @@
-package com.xuren.game.common.net.tcp.newgame;
+package com.xuren.game.common.net.tcp.codec.newgame;
 
-import com.alibaba.fastjson.JSON;
-import com.xuren.game.common.net.INetChannel;
-import com.xuren.game.common.net.KcpNetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.consts.NetConstants;
-import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
-import com.xuren.game.common.proto.MsgBase;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import org.beykery.jkcp.KcpOnUdp;
 
 import java.util.List;
-
-import static com.xuren.game.common.net.consts.NetConstants.KEY_PLAYER_CHANNEL;
 
 /**
  * @author xuren

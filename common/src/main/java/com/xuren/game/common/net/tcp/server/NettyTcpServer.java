@@ -1,9 +1,9 @@
-package com.xuren.game.common.net.tcp;
+package com.xuren.game.common.net.tcp.server;
 
-import com.xuren.game.common.net.tcp.newgame.BusinessHandler;
-import com.xuren.game.common.net.tcp.newgame.ProtoDecoder3;
-import com.xuren.game.common.net.tcp.newgame.ProtoEncoder3;
-import com.xuren.game.common.net.tcp.newgame.Server2Handler;
+import com.xuren.game.common.net.tcp.codec.newgame.BusinessHandler;
+import com.xuren.game.common.net.tcp.codec.newgame.ProtoDecoder3;
+import com.xuren.game.common.net.tcp.codec.newgame.ProtoEncoder3;
+import com.xuren.game.common.net.tcp.codec.newgame.Server2Handler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -44,10 +44,10 @@ public class NettyTcpServer {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline().addLast("decoder", new ProtoDecoder3())
+                        .addLast("encoder", new ProtoEncoder3())
                         .addLast("idleHandler", new IdleStateHandler(35 * 5, 0, 0, TimeUnit.SECONDS))
                         .addLast("server-handler", new Server2Handler())
-                        .addLast("business-handler", new BusinessHandler())
-                        .addLast("encoder", new ProtoEncoder3());
+                        .addLast("business-handler", new BusinessHandler());
             }
         });
         InetSocketAddress address = new InetSocketAddress(ip, port);

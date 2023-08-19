@@ -3,10 +3,13 @@ package com.xuren.game.common.net;
 import com.xuren.game.common.net.consts.NetConstants;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  * @author xuren
  */
-public class TcpNetChannel extends NetChannel{
+public class TcpNetChannel extends NetChannel implements Closeable {
     private ChannelHandlerContext context;
     public TcpNetChannel(ChannelHandlerContext context) {
         this.context = context;
@@ -21,5 +24,10 @@ public class TcpNetChannel extends NetChannel{
 
     public static NetChannel findNetChannel(ChannelHandlerContext context) {
         return context.channel().attr(NetConstants.KEY_PLAYER_CHANNEL).get();
+    }
+
+    @Override
+    public void close() throws IOException {
+        context.close();
     }
 }

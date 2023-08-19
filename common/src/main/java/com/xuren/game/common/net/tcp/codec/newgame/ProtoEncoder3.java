@@ -1,4 +1,4 @@
-package com.xuren.game.common.net.tcp.newgame;
+package com.xuren.game.common.net.tcp.codec.newgame;
 
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.NetMsgCodecUtils;

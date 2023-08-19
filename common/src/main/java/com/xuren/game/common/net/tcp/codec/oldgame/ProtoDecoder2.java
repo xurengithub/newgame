@@ -1,4 +1,4 @@
-package com.xuren.game.common.net.tcp.oldgame;
+package com.xuren.game.common.net.tcp.codec.oldgame;
 
 import com.xuren.game.common.proto.MsgBase;
 import io.netty.buffer.ByteBuf;

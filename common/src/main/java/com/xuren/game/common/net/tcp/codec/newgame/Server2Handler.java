@@ -1,14 +1,15 @@
-package com.xuren.game.common.net.tcp.newgame;
+package com.xuren.game.common.net.tcp.codec.newgame;
 
 import com.xuren.game.common.net.INetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.TcpNetChannel;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
-import com.xuren.game.common.net.tcp.ServerHandler;
+import com.xuren.game.common.net.tcp.server.ServerHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import static com.xuren.game.common.net.consts.NetConstants.KEY_PLAYER_CHANNEL;
 /**
  * @author xuren
  */
+@ChannelHandler.Sharable
 public class Server2Handler extends SimpleChannelInboundHandler<NetMsg> {
     private static final Logger log = LoggerFactory.getLogger(ServerHandler.class);
 

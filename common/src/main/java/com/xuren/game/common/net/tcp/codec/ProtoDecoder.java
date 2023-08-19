@@ -1,5 +1,6 @@
-package com.xuren.game.common.net.tcp;
+package com.xuren.game.common.net.tcp.codec;
 
+import com.xuren.game.common.net.tcp.Packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

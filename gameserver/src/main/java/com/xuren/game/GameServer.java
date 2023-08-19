@@ -1,7 +1,8 @@
 package com.xuren.game;
 
 import com.xuren.game.common.log.Log;
-import com.xuren.game.common.net.tcp.NettyTcpServer;
+import com.xuren.game.common.net.tcp.server.NettyTcpServer;
+import com.xuren.game.common.proto.ProtoHandlerManager;
 import com.xuren.game.common.zk.ZKClient;
 import com.xuren.game.common.zk.ZKConfig;
 import com.xuren.game.logic.scene.SceneManager;
@@ -16,9 +17,9 @@ public class GameServer {
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
         initProtoHandler();
-        initZK();
+//        initZK();
         initProperties();
-        initScene();
+//        initScene();
         initNet();
     }
 
@@ -26,6 +27,7 @@ public class GameServer {
      * 初始化协议处理器
      */
     private static void initProtoHandler() {
+        ProtoHandlerManager.init("com.xuren.game.handler");
     }
 
     /**

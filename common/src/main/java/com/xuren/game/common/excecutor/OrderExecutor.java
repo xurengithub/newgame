@@ -26,15 +26,15 @@ public class OrderExecutor implements Executor {
     }
 
     public <T> CompletableFuture<T> compose(String key, Supplier<CompletableFuture<T>> supplier) {
-        var future = resultMap.compute(key, (k, f) -> f == null ? CompletableFuture.runAsync(() -> {}).thenCompose(v -> supplier.get()) : f.thenCompose(v -> supplier.get()));
-        if (future == null) {
-            var newFuture = CompletableFuture.runAsync(() -> {}).thenCompose(v -> supplier.get());
-            resultMap.put(key, newFuture);
-            return newFuture;
-        } else {
-            var newFuture = future.thenCompose(v -> supplier.get());
-            resultMap.put(key, newFuture);
-            return newFuture;
-        }
+        return (CompletableFuture<T>) resultMap.compute(key, (k, f) -> f == null ? CompletableFuture.runAsync(() -> {}).thenCompose(v -> supplier.get()) : f.thenCompose(v -> supplier.get()));
+//        if (future == null) {
+//            var newFuture = CompletableFuture.runAsync(() -> {}).thenCompose(v -> supplier.get());
+//            resultMap.put(key, newFuture);
+//            return newFuture;
+//        } else {
+//            var newFuture = future.thenCompose(v -> supplier.get());
+//            resultMap.put(key, newFuture);
+//            return newFuture;
+//        }
     }
 }
