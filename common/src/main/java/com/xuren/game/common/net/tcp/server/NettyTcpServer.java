@@ -1,9 +1,6 @@
 package com.xuren.game.common.net.tcp.server;
 
 import com.xuren.game.common.net.tcp.codec.newgame.BusinessHandler;
-import com.xuren.game.common.net.tcp.codec.newgame.ProtoDecoder3;
-import com.xuren.game.common.net.tcp.codec.newgame.ProtoEncoder3;
-import com.xuren.game.common.net.tcp.codec.newgame.Server2Handler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -12,12 +9,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
 
 public class NettyTcpServer {
     private static final Logger log = LoggerFactory.getLogger(NettyTcpServer.class);
@@ -39,17 +34,11 @@ public class NettyTcpServer {
 			    .childOption(ChannelOption.TCP_NODELAY, true);
     }
 
+    public void init(ChannelInitializer<SocketChannel> initializer) {
+        bootstrap.childHandler(initializer);
+    }
+
     public void bind(String ip, int port) {
-        bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            protected void initChannel(SocketChannel ch) throws Exception {
-                ch.pipeline().addLast("decoder", new ProtoDecoder3())
-                        .addLast("encoder", new ProtoEncoder3())
-                        .addLast("idleHandler", new IdleStateHandler(35 * 5, 0, 0, TimeUnit.SECONDS))
-                        .addLast("server-handler", new Server2Handler())
-                        .addLast("business-handler", new BusinessHandler());
-            }
-        });
         InetSocketAddress address = new InetSocketAddress(ip, port);
         try {
             ChannelFuture future = bootstrap.bind(address).sync();

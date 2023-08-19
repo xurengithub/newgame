@@ -1,10 +1,10 @@
-package com.xuren.game.common.net.tcp.codec.newgame;
+package com.xuren.game.net;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xuren.game.common.excecutor.LogicExecutors;
-import com.xuren.game.common.net.NetChannel;
+import com.xuren.game.common.net.channel.NetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
@@ -15,7 +15,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;

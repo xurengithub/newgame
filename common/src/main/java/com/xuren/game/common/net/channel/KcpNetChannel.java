@@ -1,6 +1,5 @@
-package com.xuren.game.common.net;
+package com.xuren.game.common.net.channel;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.beykery.jkcp.KcpOnUdp;
 

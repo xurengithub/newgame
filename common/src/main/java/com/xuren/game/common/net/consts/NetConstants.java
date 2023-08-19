@@ -1,9 +1,6 @@
 package com.xuren.game.common.net.consts;
 
-import com.xuren.game.common.net.INetChannel;
-import com.xuren.game.common.net.KcpNetChannel;
-import com.xuren.game.common.net.NetChannel;
-import com.xuren.game.common.net.TcpNetChannel;
+import com.xuren.game.common.net.channel.NetChannel;
 import io.netty.util.AttributeKey;
 
 /**

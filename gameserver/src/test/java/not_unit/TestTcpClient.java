@@ -1,7 +1,7 @@
 /**
  * 客户端
  */
-package com.xuren.game.common.net.kcp;
+package not_unit;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 /**
  * @author beykery
  */
-public class TestClient extends KcpClient {
+public class TestTcpClient extends KcpClient {
 
     @Override
     public void handleReceive(ByteBuf bb, KcpOnUdp kcp) {
@@ -59,7 +59,7 @@ public class TestClient extends KcpClient {
      */
     public static void main(String[] args) throws InterruptedException {
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
-        TestClient tc = new TestClient();
+        TestTcpClient tc = new TestTcpClient();
         tc.noDelay(1, 20, 2, 1);
         tc.setMinRto(10);
         tc.wndSize(32, 32);

@@ -1,6 +1,5 @@
 package com.xuren.game.common.net;
 
-import com.xuren.game.common.net.consts.NetConstants;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import io.netty.buffer.ByteBuf;

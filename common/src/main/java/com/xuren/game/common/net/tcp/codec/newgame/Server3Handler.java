@@ -1,8 +1,8 @@
 package com.xuren.game.common.net.tcp.codec.newgame;
 
-import com.xuren.game.common.net.INetChannel;
+import com.xuren.game.common.net.channel.INetChannel;
 import com.xuren.game.common.net.NetMsg;
-import com.xuren.game.common.net.TcpNetChannel;
+import com.xuren.game.common.net.channel.TcpNetChannel;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import com.xuren.game.common.net.tcp.server.ServerHandler;
@@ -24,13 +24,13 @@ import static com.xuren.game.common.net.consts.NetConstants.KEY_PLAYER_CHANNEL;
  * @author xuren
  */
 @ChannelHandler.Sharable
-public class Server2Handler extends SimpleChannelInboundHandler<NetMsg> {
+public class Server3Handler extends SimpleChannelInboundHandler<NetMsg> {
     private static final Logger log = LoggerFactory.getLogger(ServerHandler.class);
 
 
     private final ConcurrentMap<Channel, Channel> ref = new ConcurrentHashMap<Channel, Channel>();
 
-    public Server2Handler() {
+    public Server3Handler() {
 
     }
 

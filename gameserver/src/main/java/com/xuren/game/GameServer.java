@@ -10,6 +10,7 @@ import com.xuren.game.common.zk.ZKClient;
 import com.xuren.game.common.zk.ZKConfig;
 import com.xuren.game.cache.PlayerCache;
 import com.xuren.game.logic.scene.SceneManager;
+import com.xuren.game.net.NettyTcpServerInitializer;
 
 import java.io.IOException;
 
@@ -20,14 +21,15 @@ import java.io.IOException;
 public class GameServer {
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
+        initProperties();
         initProtoHandler();
         initZK();
         initMongo();
         initCache();
         initRedis();
-        initProperties();
-//        initScene();
         initNet();
+//        initScene();
+
     }
 
     private static void initRedis() {
@@ -39,7 +41,7 @@ public class GameServer {
     }
 
     private static void initMongo() {
-        MongodbService.init("mongodb://127.0.0.1:27017", "1", "1");
+        MongodbService.init("mongodb://127.0.0.1:27017", "1", "", BaseConfig.getInstance().getSec());
     }
 
     /**
@@ -47,7 +49,8 @@ public class GameServer {
      */
     private static void initNet() {
         NettyTcpServer nettyTcpServer = new NettyTcpServer();
-        nettyTcpServer.bind("127.0.0.1", 55667);
+        nettyTcpServer.init(new NettyTcpServerInitializer());
+        nettyTcpServer.bind("127.0.0.1", BaseConfig.getInstance().getNetPort());
         nettyTcpServer.start();
     }
 
@@ -76,7 +79,14 @@ public class GameServer {
 
     private static void initProperties() {
         BaseConfig.getInstance().setSec("1");
-//        ZKConfig.instance;
+
+        ZKConfig.instance.setSessionTimeoutMs(60000);
+        ZKConfig.instance.setConnectionTimeoutMs(5000);
+        ZKConfig.instance.setConnectString("127.0.0.1:2181");
+        ZKConfig.instance.setElapsedTimeMs(5000);
+        ZKConfig.instance.setNamespace("game");
+        ZKConfig.instance.setRetryCount(5);
+        ZKConfig.instance.setRetrySleepTimeMs(1000);
         // todo 初始化属性系统
         // 希望先加载.properties文件
         // 然后程序—D的属性

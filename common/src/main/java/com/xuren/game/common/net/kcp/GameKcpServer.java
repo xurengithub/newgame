@@ -1,8 +1,8 @@
 package com.xuren.game.common.net.kcp;
 
 import com.alibaba.fastjson.JSON;
-import com.xuren.game.common.net.INetChannel;
-import com.xuren.game.common.net.KcpNetChannel;
+import com.xuren.game.common.net.channel.INetChannel;
+import com.xuren.game.common.net.channel.KcpNetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.consts.NetConstants;
 import com.xuren.game.common.net.enums.PackageTypeEnum;

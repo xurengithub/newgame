@@ -1,5 +1,6 @@
-package com.xuren.game.common.net;
+package com.xuren.game.common.net.channel;
 
+import com.xuren.game.common.net.channel.NetChannel;
 import com.xuren.game.common.net.consts.NetConstants;
 import io.netty.channel.ChannelHandlerContext;
 

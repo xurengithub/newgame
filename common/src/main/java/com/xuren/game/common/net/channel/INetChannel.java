@@ -1,4 +1,4 @@
-package com.xuren.game.common.net;
+package com.xuren.game.common.net.channel;
 
 /**
  * @author xuren

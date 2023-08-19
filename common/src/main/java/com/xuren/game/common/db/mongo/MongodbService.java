@@ -17,11 +17,11 @@ import static org.springframework.data.mongodb.core.ReactiveMongoTemplate.NO_OP_
  * @author xuren
  */
 public class MongodbService implements AutoCloseable{
-    private MongoClient client;
-    private ReactiveMongoTemplate reactiveMongoTemplate;
+    private final MongoClient client;
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
     private static final Map<String, MongodbService> INSTANCES = Maps.newConcurrentMap();
 
-    private MongodbService(String connectStr, String dbName) {
+    private MongodbService(String connectStr, String dbName, String username, String password) {
         this.client = MongoClients.create(connectStr);
         ReactiveMongoDatabaseFactory factory = new SimpleReactiveMongoDatabaseFactory(client, dbName);
 
@@ -34,8 +34,8 @@ public class MongodbService implements AutoCloseable{
         mongoConverter.afterPropertiesSet();
         this.reactiveMongoTemplate = new ReactiveMongoTemplate(factory, mongoConverter);
     }
-    public static void init(String connectStr, String dbName, String sec) {
-        INSTANCES.put(sec, new MongodbService(connectStr, dbName));
+    public static void init(String connectStr, String dbName, String userName, String password, String sec) {
+        INSTANCES.put(sec, new MongodbService(connectStr, dbName, userName, password));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.xuren.game.common.config.BaseConfig;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
+import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -18,12 +19,14 @@ public class LettuceRedis implements AutoCloseable{
     }
     public static void init(String ip, int port, String username, String password) {
         LettuceRedis lettuceRedis = new LettuceRedis();
-        RedisURI redisURI = RedisURI.builder()
+        RedisURI.Builder builder = RedisURI.builder()
                 .withHost(ip)
                 .withPort(port)
-                .withAuthentication(username, password.toCharArray())
-                .withTimeout(Duration.ofSeconds(10))
-                .build();
+                .withTimeout(Duration.ofSeconds(10));
+        if (StringUtils.hasText(username)) {
+            builder.withAuthentication(username, password.toCharArray());
+        }
+        RedisURI redisURI = builder.build();
         lettuceRedis.client = RedisClient.create(redisURI);
         lettuceRedis.connection = lettuceRedis.client.connect();
         instanceMap.put(BaseConfig.getInstance().getSec(), lettuceRedis);
@@ -45,10 +48,8 @@ public class LettuceRedis implements AutoCloseable{
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         connection.close();
         client.shutdown();
     }
-
-
 }

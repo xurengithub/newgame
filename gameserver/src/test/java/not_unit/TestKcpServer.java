@@ -1,7 +1,7 @@
 /**
  * 测试
  */
-package com.xuren.game.common.net.kcp;
+package not_unit;
 
 import io.netty.buffer.ByteBuf;
 import org.beykery.jkcp.KcpOnUdp;
@@ -12,9 +12,9 @@ import java.nio.charset.Charset;
 /**
  * @author beykery
  */
-public class TestServer extends KcpServer {
+public class TestKcpServer extends KcpServer {
 
-    public TestServer(int port, int workerSize) {
+    public TestKcpServer(int port, int workerSize) {
         super(port, workerSize);
     }
 
@@ -54,7 +54,7 @@ public class TestServer extends KcpServer {
      * @param args
      */
     public static void main(String[] args) {
-        TestServer s = new TestServer(2222, 1);
+        TestKcpServer s = new TestKcpServer(2222, 1);
         s.noDelay(1, 10, 2, 1);
         s.setMinRto(10);
         s.wndSize(64, 64);

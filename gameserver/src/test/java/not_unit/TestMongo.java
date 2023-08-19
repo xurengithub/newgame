@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class TestMongo {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        MongodbService.init("mongodb://127.0.0.1:27017", "1", "1");
+        MongodbService.init("mongodb://127.0.0.1:27017", "1", "", "", "1");
         Role role = new Role();
         role.setRid("10005  ");
         System.out.println(JSON.toJSONString(MongodbService.getMongodbService("1").getReactiveMongoTemplate().insert(role).block()));;
