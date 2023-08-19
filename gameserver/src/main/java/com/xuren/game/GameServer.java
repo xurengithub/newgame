@@ -1,6 +1,8 @@
 package com.xuren.game;
 
+import com.google.api.client.util.Lists;
 import com.xuren.game.common.config.BaseConfig;
+import com.xuren.game.common.db.mongo.MongoConfig;
 import com.xuren.game.common.db.mongo.MongodbService;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.tcp.server.NettyTcpServer;
@@ -41,7 +43,7 @@ public class GameServer {
     }
 
     private static void initMongo() {
-        MongodbService.init("mongodb://127.0.0.1:27017", "1", "", BaseConfig.getInstance().getSec());
+        MongodbService.init(MongoConfig.instance, BaseConfig.getInstance().getSec());
     }
 
     /**
@@ -87,6 +89,14 @@ public class GameServer {
         ZKConfig.instance.setNamespace("game");
         ZKConfig.instance.setRetryCount(5);
         ZKConfig.instance.setRetrySleepTimeMs(1000);
+
+        MongoConfig.instance.setAuthDbName("1");
+        MongoConfig.instance.setReplicaSetName("1");
+        MongoConfig.instance.setMaxConnectionPoolSize(10);
+        MongoConfig.instance.setPassword("");
+        MongoConfig.instance.setUsername("");
+        MongoConfig.instance.setDbName("");
+        MongoConfig.instance.setCluster(Lists.newArrayList());
         // todo 初始化属性系统
         // 希望先加载.properties文件
         // 然后程序—D的属性

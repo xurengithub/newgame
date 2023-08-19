@@ -1,5 +1,9 @@
 package com.xuren.game.common.db.mongo;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
+import com.mongodb.ReadPreference;
+import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
@@ -7,9 +11,11 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.util.StringUtils;
 import org.testng.collections.Maps;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.ReactiveMongoTemplate.NO_OP_REF_RESOLVER;
 
@@ -21,9 +27,31 @@ public class MongodbService implements AutoCloseable{
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private static final Map<String, MongodbService> INSTANCES = Maps.newConcurrentMap();
 
-    private MongodbService(String connectStr, String dbName, String username, String password) {
-        this.client = MongoClients.create(connectStr);
-        ReactiveMongoDatabaseFactory factory = new SimpleReactiveMongoDatabaseFactory(client, dbName);
+    private MongodbService(MongoConfig mongoConfig) {
+        var settings = MongoClientSettings.builder()
+            .readPreference(ReadPreference.primaryPreferred())
+            .applyToClusterSettings(cluster -> {
+                    cluster.hosts(mongoConfig.getCluster()
+                        .stream()
+                        .map(host -> new ServerAddress(host.getHost(), host.getPort()))
+                        .collect(Collectors.toList())
+                    );
+                    if (StringUtils.hasText(mongoConfig.getReplicaSetName())) {
+                        cluster.requiredReplicaSetName(mongoConfig.getReplicaSetName());
+                    }
+                }
+            )
+            .applicationName("mmo")
+            .credential(MongoCredential.createCredential(
+                mongoConfig.getUsername(),
+                mongoConfig.getAuthDbName(),
+                mongoConfig.getPassword().toCharArray()
+            ))
+            .applyToConnectionPoolSettings(pool -> pool.maxSize(mongoConfig.getMaxConnectionPoolSize()))
+            .build();
+
+        this.client = MongoClients.create(settings);
+        ReactiveMongoDatabaseFactory factory = new SimpleReactiveMongoDatabaseFactory(client, mongoConfig.getDbName());
 
         MongoMappingContext context = new MongoMappingContext();
         context.setAutoIndexCreation(true);
@@ -34,8 +62,8 @@ public class MongodbService implements AutoCloseable{
         mongoConverter.afterPropertiesSet();
         this.reactiveMongoTemplate = new ReactiveMongoTemplate(factory, mongoConverter);
     }
-    public static void init(String connectStr, String dbName, String userName, String password, String sec) {
-        INSTANCES.put(sec, new MongodbService(connectStr, dbName, userName, password));
+    public static void init(MongoConfig mongoConfig, String sec) {
+        INSTANCES.put(sec, new MongodbService(mongoConfig));
     }
 
     @Override
