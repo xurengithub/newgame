@@ -61,12 +61,23 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
         // 进入场景怎么办，事件里有进入场景的id
         PlayerCache.getAsync(msg.getRid())
             .thenAccept(playerEntity -> {
-                Operation operationObj = (Operation) JSON.parseObject(new String(msg.getData()), operationClass);
-                operationObj.setOperationType(msg.getMsgCode());
-                SceneEvent sceneEvent = new SceneEvent();
-                sceneEvent.setRid(playerEntity.getRid());
-                sceneEvent.setOperations(List.of(operationObj));
-                SceneManager.getScene(playerEntity.getSceneId()).addSceneEvent(sceneEvent);
+                if (playerEntity != null) {
+                    Operation operationObj = (Operation) JSON.parseObject(new String(msg.getData()), operationClass);
+                    operationObj.setOperationType(msg.getMsgCode());
+                    SceneEvent sceneEvent = new SceneEvent();
+                    sceneEvent.setRid(playerEntity.getRid());
+                    sceneEvent.setOperations(List.of(operationObj));
+                    if (!StringUtils.hasText(playerEntity.getSceneId())) {
+                        SceneManager.enterDefaultScene(playerEntity);
+                    } else {
+                        if (!SceneManager.inScene(playerEntity)) {
+                            SceneManager.getScene(playerEntity.getSceneId()).enter(playerEntity);
+                        }
+                    }
+                    SceneManager.getScene(playerEntity.getSceneId()).addSceneEvent(sceneEvent);
+                } else {
+                    Log.data.error("no player:{} cache, can not sync scene", msg.getRid());
+                }
             });
 
     }

@@ -30,7 +30,7 @@ public class PlayerHandler {
 
     private PlayerEntity createPlayer() {
         PlayerEntity player = new PlayerEntity();
-        player.setSceneId("1");
+        player.setSceneId("");
         player.setRid("10001_1");
 
         TransformComponent transformComponent = new TransformComponent(new Vector3f(0, 30, 0), 30, 10);

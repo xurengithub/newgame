@@ -1,5 +1,6 @@
 package com.xuren.game.logic.scene;
 
+import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import org.testng.collections.Maps;
@@ -12,10 +13,12 @@ import java.util.Map;
  */
 public abstract class SceneManager {
     private static final Map<String, Scene> sceneMap = Maps.newHashMap();
+    private static String defaultSceneId;
 
     public static void initScene() throws IOException {
         Scene scene = initS1();
         sceneMap.put(scene.getId(), scene);
+        defaultSceneId = scene.getId();
     }
 
     public static Map<String, Scene> getSceneMap() {
@@ -24,6 +27,14 @@ public abstract class SceneManager {
 
     public static Scene getScene(String sceneId) {
         return sceneMap.get(sceneId);
+    }
+
+    public static void enterDefaultScene(PlayerEntity player) {
+        sceneMap.get(defaultSceneId).enter(player);
+    }
+
+    public static boolean inScene(PlayerEntity player) {
+        return sceneMap.get(player.getSceneId()).inScene(player.getRid());
     }
 
     private static Scene initS1() throws IOException {

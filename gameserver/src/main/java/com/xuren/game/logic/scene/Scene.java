@@ -65,6 +65,10 @@ public class Scene {
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
     }
 
+    public boolean inScene(String rid) {
+        return onlinePlayerMap.containsKey(rid);
+    }
+
     public void leave(String rid) {
         // todo   通知这些人自己离开了
         gridManager.getCurrObserverPlayers(onlinePlayerMap.get(rid));
