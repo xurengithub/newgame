@@ -16,15 +16,27 @@ public class ProtoDecoder3 extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         // [bodyLength:4][type:1][package:1]\[requestId:4][opCode:4][dataLength:4][ridLength:1][rid:x][data:y]
+
+        int length = byteBuf.readableBytes();
+        if (length < 4) {
+            return;
+        }
+        byteBuf.markReaderIndex();
         int bodyLength = byteBuf.readInt();
         if (bodyLength <= 0 || bodyLength > NetConstants.BODY_LENGTH) {
+            ctx.close();
+            throw new IllegalArgumentException(ctx + " , msg lenth is error:" + bodyLength);
+        }
+        if (bodyLength > byteBuf.readableBytes()) {
+            byteBuf.resetReaderIndex();
             return;
         }
 
         byte type = byteBuf.readByte();
         TypeEnum typeEnum = TypeEnum.getTypeEnum(type);
         if (typeEnum == null) {
-            return;
+            ctx.close();
+            throw new IllegalArgumentException(ctx + " , msg type is error:" + type);
         }
 
         NetMsg msg = new NetMsg();

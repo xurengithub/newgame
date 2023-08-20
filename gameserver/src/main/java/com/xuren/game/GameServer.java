@@ -85,6 +85,7 @@ public class GameServer {
 
     private static void initProperties() {
         BaseConfig.getInstance().setSec("1");
+        BaseConfig.getInstance().setNetPort(55667);
 
         ZKConfig.instance.setSessionTimeoutMs(60000);
         ZKConfig.instance.setConnectionTimeoutMs(5000);
