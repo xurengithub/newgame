@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.xuren.game.common.db.mongo.MongoConfig;
 import com.xuren.game.common.db.mongo.MongodbService;
 import com.xuren.game.model.Role;
 import org.bson.Document;
@@ -18,9 +19,11 @@ import java.util.concurrent.ExecutionException;
 public class TestMongo {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 //        MongodbService.init("mongodb://127.0.0.1:27017", "1", "", "", "1");
-//        Role role = new Role();
-//        role.setRid("10005  ");
-//        System.out.println(JSON.toJSONString(MongodbService.getMongodbService("1").getReactiveMongoTemplate().insert(role).block()));;
+        MongoConfig mongoConfig = JSON.parseObject("{\"username\": \"root\",\"password\": \"123456\",\"authDbName\": \"admin\", \"dbName\": \"1\",\"replicaSetName\": null,\"cluster\": [{\"host\": \"127.0.0.1\", \"port\": 27017}]}", MongoConfig.class);
+        MongodbService.init(mongoConfig, "1");
+        Role role = new Role();
+        role.setRid("10005  ");
+        System.out.println(JSON.toJSONString(MongodbService.getMongodbService("1").getReactiveMongoTemplate().insert(role).block()));;
 
 //        ReactiveMongoTemplate reactiveMongoTemplate = new ReactiveMongoTemplate(MongoClients.create("mongodb://127.0.0.1:27017"), "1");
 //        System.out.println(JSON.toJSONString(reactiveMongoTemplate.insert(role).block()));;

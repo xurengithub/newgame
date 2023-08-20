@@ -1,6 +1,5 @@
 package com.xuren.game.common.zk;
 
-import com.xuren.game.common.utils.ZKUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -28,12 +27,15 @@ public class ZKClient {
     public CuratorFramework getCuratorFramework() {
         return curatorFramework;
     }
+    public static void start() {
+        instance.curatorFramework.start();
+    }
 
     public static void registerNode() {
         try {
             String ip = InetAddress.getLocalHost().getHostAddress();
             String rootPath = "/" + ZkConsts.GAME_NODE_PATH;
-            if (instance.existsPath(rootPath)) {
+            if (!instance.existsPath(rootPath)) {
                 instance.create(rootPath, "".getBytes());
             }
             instance.createEphemeral(rootPath + "/" + ip, "".getBytes());

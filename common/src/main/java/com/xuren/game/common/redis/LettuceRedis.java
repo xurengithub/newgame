@@ -4,21 +4,28 @@ import com.xuren.game.common.config.BaseConfig;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+import io.lettuce.core.api.sync.RedisCommands;
 import org.springframework.util.StringUtils;
+import org.testng.collections.Maps;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class LettuceRedis implements AutoCloseable{
-    private static final Map<String, LettuceRedis> instanceMap = new HashMap<>();
-    private RedisClient client;
-    private StatefulRedisConnection<String, String> connection;
+public class LettuceRedis {
+    private static final Map<String, RedisURI> URI_MAP = new HashMap<>();
+    private static final Map<RedisURI, RedisClient> CLIENT_MAP = new HashMap<>();
+    private static final Map<RedisURI, Map<RedisConnection, StatefulRedisConnection<String, String>>> CONNECTION_MAP = new ConcurrentHashMap<>();
+//    private static final Map<String, RedisClient> clientMap = new HashMap<>();
+//    private static final Map<String, StatefulRedisConnection<String, String>> connectMap = new HashMap<>();
+//    private RedisClient client;
+//    private StatefulRedisConnection<String, String> connection;
     private LettuceRedis() {
 
     }
     public static void init(String ip, int port, String username, String password) {
-        LettuceRedis lettuceRedis = new LettuceRedis();
         RedisURI.Builder builder = RedisURI.builder()
                 .withHost(ip)
                 .withPort(port)
@@ -26,30 +33,40 @@ public class LettuceRedis implements AutoCloseable{
         if (StringUtils.hasText(username)) {
             builder.withAuthentication(username, password.toCharArray());
         }
+
         RedisURI redisURI = builder.build();
-        lettuceRedis.client = RedisClient.create(redisURI);
-        lettuceRedis.connection = lettuceRedis.client.connect();
-        instanceMap.put(BaseConfig.getInstance().getSec(), lettuceRedis);
+        var client = RedisClient.create(redisURI);
+        URI_MAP.put(BaseConfig.getInstance().getSec(), redisURI);
+        CLIENT_MAP.put(redisURI, client);
     }
 
-    public static void closeAll() {
-        instanceMap.values()
-                .forEach(lettuceRedis -> {
-                    try {
-                        lettuceRedis.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+    public static RedisAsyncCommands<String, String> async(String sec) {
+        var redisUri = URI_MAP.get(sec);
+        return CONNECTION_MAP.computeIfAbsent(redisUri, redisURI -> {
+            Map<RedisConnection, StatefulRedisConnection<String, String>> map = Maps.newConcurrentMap();
+            map.computeIfAbsent(RedisConnection.Async, redisConnection -> CLIENT_MAP.get(URI_MAP.get(sec)).connect());
+            return map;
+        }).get(RedisConnection.Async).async();
     }
 
-    public static LettuceRedis get(String sec) {
-        return instanceMap.get(sec);
+    public static RedisAsyncCommands<String, String> async() {
+        return async(BaseConfig.getInstance().getSec());
     }
 
-    @Override
-    public void close() {
-        connection.close();
-        client.shutdown();
+    public static RedisCommands<String, String> sync(String sec) {
+        var redisUri = URI_MAP.get(sec);
+        return CONNECTION_MAP.computeIfAbsent(redisUri, redisURI -> {
+            Map<RedisConnection, StatefulRedisConnection<String, String>> map = Maps.newConcurrentMap();
+            map.computeIfAbsent(RedisConnection.Sync, redisConnection -> CLIENT_MAP.get(URI_MAP.get(sec)).connect());
+            return map;
+        }).get(RedisConnection.Sync).sync();
+    }
+
+    public static RedisCommands<String, String> sync() {
+        return sync(BaseConfig.getInstance().getSec());
+    }
+
+    private enum RedisConnection {
+        Sync, Async
     }
 }

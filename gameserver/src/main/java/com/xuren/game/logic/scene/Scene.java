@@ -8,8 +8,8 @@ import com.xuren.game.logic.scene.events.SceneEvent;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
 import com.xuren.game.logic.scene.options.FindWayOption;
 import com.xuren.game.logic.scene.options.JoystickOption;
-import com.xuren.game.logic.scene.options.Option;
-import com.xuren.game.logic.scene.options.OptionType;
+import com.xuren.game.logic.scene.options.Operation;
+import com.xuren.game.logic.scene.options.OperationType;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
 import com.xuren.game.logic.scene.systems.aoi.AOISystem;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
@@ -121,15 +121,15 @@ public class Scene {
     }
 
     private void processEvent(PlayerEntity playerEntity, SceneEvent event) {
-        for (Option opt : event.getOptions()) {
-            if (opt.getOptionType() == OptionType.FIND_WAY.getType()) {
+        for (Operation opt : event.getOperations()) {
+            if (opt.getOperationType() == OperationType.FIND_WAY.getType()) {
                 FindWayOption findWayOption = (FindWayOption) opt;
                 if (Objects.nonNull(playerEntity.getTransformComponent())) {
                     processFindWay(playerEntity, easy3dNav, findWayOption.getPoint());
                 }
             }
 
-            if (opt.getOptionType() == OptionType.JOYSTICK.getType()) {
+            if (opt.getOperationType() == OperationType.JOYSTICK.getType()) {
                 JoystickOption joyStickOption = (JoystickOption) opt;
                 if (Objects.nonNull(playerEntity.getTransformComponent())) {
                     processJoystick(playerEntity, joyStickOption);

@@ -1,12 +1,13 @@
 package com.xuren.game.logic.scene.events;
 
-import com.xuren.game.logic.scene.options.Option;
+
+import com.xuren.game.logic.scene.options.Operation;
 
 import java.util.List;
 
 public class SceneEvent implements IEvent {
     private String rid;
-    private List<Option> options;
+    private List<Operation> operations;
 
     public String getRid() {
         return rid;
@@ -16,11 +17,11 @@ public class SceneEvent implements IEvent {
         this.rid = rid;
     }
 
-    public List<Option> getOptions() {
-        return options;
+    public List<Operation> getOperations() {
+        return operations;
     }
 
-    public void setOptions(List<Option> options) {
-        this.options = options;
+    public void setOperations(List<Operation> operations) {
+        this.operations = operations;
     }
 }

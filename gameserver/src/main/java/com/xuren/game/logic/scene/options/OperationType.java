@@ -3,7 +3,7 @@ package com.xuren.game.logic.scene.options;
 /**
  * @author xuren
  */
-public enum OptionType {
+public enum OperationType {
     /**
      * 摇杆
      */
@@ -14,7 +14,7 @@ public enum OptionType {
      */
     FIND_WAY(1),;
 
-    OptionType(int type) {
+    OperationType(int type) {
         this.type = type;
     }
 

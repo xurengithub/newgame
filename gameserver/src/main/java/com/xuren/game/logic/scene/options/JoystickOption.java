@@ -3,7 +3,7 @@ package com.xuren.game.logic.scene.options;
 /**
  * @author xuren
  */
-public class JoystickOption extends Option{
+public class JoystickOption extends Operation{
     private boolean open;
     private float degree;
     private float cameraEulerY;

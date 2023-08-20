@@ -9,7 +9,7 @@ import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.events.SceneEvent;
 import com.xuren.game.logic.scene.options.FindWayOption;
 import com.xuren.game.logic.scene.options.JoystickOption;
-import com.xuren.game.logic.scene.options.OptionType;
+import com.xuren.game.logic.scene.options.OperationType;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.annotations.Test;
@@ -66,9 +66,9 @@ public class TestAOI {
         SceneEvent sceneEvent = new SceneEvent();
         sceneEvent.setRid("10001");
         FindWayOption option = new FindWayOption();
-        option.setOptionType(OptionType.FIND_WAY.getType());
+        option.setOperationType(OperationType.FIND_WAY.getType());
         option.setPoint(new Vector3f(6.4576626f, 10.197294f, -18.33406f));
-        sceneEvent.setOptions(List.of(option));
+        sceneEvent.setOperations(List.of(option));
         return sceneEvent;
     }
 
@@ -76,11 +76,11 @@ public class TestAOI {
         SceneEvent sceneEvent = new SceneEvent();
         sceneEvent.setRid(rid);
         JoystickOption joystickOption = new JoystickOption();
-        joystickOption.setOptionType(OptionType.JOYSTICK.getType());
+        joystickOption.setOperationType(OperationType.JOYSTICK.getType());
         joystickOption.setCameraEulerY(cameraEulerY);
         joystickOption.setDegree(degree);
         joystickOption.setOpen(open);
-        sceneEvent.setOptions(List.of(joystickOption));
+        sceneEvent.setOperations(List.of(joystickOption));
         return sceneEvent;
     }
 }

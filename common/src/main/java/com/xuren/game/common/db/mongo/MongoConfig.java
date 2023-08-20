@@ -10,7 +10,7 @@ public class MongoConfig {
     private String dbName;
     private String authDbName;
     private List<HostConfig> cluster;
-    private String ReplicaSetName;
+    private String replicaSetName;
     private int maxConnectionPoolSize;
     public static final MongoConfig instance = new MongoConfig();
     private MongoConfig() {
@@ -49,11 +49,11 @@ public class MongoConfig {
     }
 
     public String getReplicaSetName() {
-        return ReplicaSetName;
+        return replicaSetName;
     }
 
     public void setReplicaSetName(String replicaSetName) {
-        ReplicaSetName = replicaSetName;
+        this.replicaSetName = replicaSetName;
     }
 
     public int getMaxConnectionPoolSize() {

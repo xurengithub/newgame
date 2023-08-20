@@ -1,7 +1,7 @@
 package com.xuren.game;
 
-import com.google.api.client.util.Lists;
 import com.xuren.game.common.config.BaseConfig;
+import com.xuren.game.common.config.HostConfig;
 import com.xuren.game.common.db.mongo.MongoConfig;
 import com.xuren.game.common.db.mongo.MongodbService;
 import com.xuren.game.common.log.Log;
@@ -12,9 +12,11 @@ import com.xuren.game.common.zk.ZKClient;
 import com.xuren.game.common.zk.ZKConfig;
 import com.xuren.game.cache.PlayerCache;
 import com.xuren.game.logic.scene.SceneManager;
+import com.xuren.game.logic.scene.options.OperationManager;
 import com.xuren.game.net.NettyTcpServerInitializer;
 
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -24,6 +26,7 @@ public class GameServer {
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
         initProperties();
+        OperationManager.init("com.xuren.game.logic.scene.options");
         initProtoHandler();
         initZK();
         initMongo();
@@ -35,7 +38,7 @@ public class GameServer {
     }
 
     private static void initRedis() {
-        LettuceRedis.init("127.0.0.1", 3306, "", "");
+        LettuceRedis.init("127.0.0.1", 6379, "", "");
     }
 
     private static void initCache() {
@@ -76,6 +79,7 @@ public class GameServer {
 
     private static void initZK() {
         ZKClient.init(ZKConfig.instance);
+        ZKClient.start();
         ZKClient.registerNode();
     }
 
@@ -90,13 +94,13 @@ public class GameServer {
         ZKConfig.instance.setRetryCount(5);
         ZKConfig.instance.setRetrySleepTimeMs(1000);
 
-        MongoConfig.instance.setAuthDbName("1");
-        MongoConfig.instance.setReplicaSetName("1");
+        MongoConfig.instance.setAuthDbName("admin");
+        MongoConfig.instance.setReplicaSetName(null);
         MongoConfig.instance.setMaxConnectionPoolSize(10);
-        MongoConfig.instance.setPassword("");
-        MongoConfig.instance.setUsername("");
-        MongoConfig.instance.setDbName("");
-        MongoConfig.instance.setCluster(Lists.newArrayList());
+        MongoConfig.instance.setPassword("123456");
+        MongoConfig.instance.setUsername("root");
+        MongoConfig.instance.setDbName(BaseConfig.getInstance().getSec());
+        MongoConfig.instance.setCluster(List.of(new HostConfig("127.0.0.1", 27017)));
         // todo 初始化属性系统
         // 希望先加载.properties文件
         // 然后程序—D的属性
