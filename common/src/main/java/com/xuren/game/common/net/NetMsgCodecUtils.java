@@ -17,8 +17,8 @@ public abstract class NetMsgCodecUtils {
         bf.writeByte(msg.getType().value());
         bf.writeByte(msg.getPackageTypeEnum().value());
         bf.writeInt(msg.getRequestId());
-        bf.writeLong(1);
-        bf.writeInt(1);
+        bf.writeLong(msg.getSystemTime());
+        bf.writeInt(msg.getProcessTime());
         bf.writeInt(msg.getData().length);
         bf.writeBytes(msg.getData());
     }

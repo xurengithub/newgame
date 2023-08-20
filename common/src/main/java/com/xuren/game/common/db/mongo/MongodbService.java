@@ -6,6 +6,7 @@ import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import com.xuren.game.common.config.BaseConfig;
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
@@ -73,6 +74,10 @@ public class MongodbService implements AutoCloseable{
 
     public static MongodbService getMongodbService(String key) {
         return INSTANCES.get(key);
+    }
+
+    public static MongodbService getMongodbService() {
+        return getMongodbService(BaseConfig.getInstance().getSec());
     }
 
     public ReactiveMongoTemplate getReactiveMongoTemplate() {

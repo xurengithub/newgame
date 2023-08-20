@@ -18,6 +18,8 @@ public class NetMsg implements Cleanable {
     private byte[] data;
 
     private String version = "";
+    private long systemTime;
+    private int processTime;
 
     public TypeEnum getType() {
         return type;
@@ -75,6 +77,22 @@ public class NetMsg implements Cleanable {
         this.version = version;
     }
 
+    public long getSystemTime() {
+        return systemTime;
+    }
+
+    public void setSystemTime(long systemTime) {
+        this.systemTime = systemTime;
+    }
+
+    public int getProcessTime() {
+        return processTime;
+    }
+
+    public void setProcessTime(int processTime) {
+        this.processTime = processTime;
+    }
+
     @Override
     public void clear() {
         type = null;
@@ -84,5 +102,7 @@ public class NetMsg implements Cleanable {
         requestId = -1;
         rid = null;
         version = "";
+        systemTime = 0;
+        processTime = 0;
     }
 }

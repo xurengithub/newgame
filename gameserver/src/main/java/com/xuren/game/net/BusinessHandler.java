@@ -93,6 +93,7 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
             // todo checktoken
 //            Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), msg.getRid(), JSONObject.parseObject(new String(msg.getData()), methodHandler.getParamType()));
             CompletionStage<Object> future;
+            long t1 = System.currentTimeMillis();
             if (CompletionStage.class.isAssignableFrom(methodHandler.getMethod().getReturnType())) {
                 future = playerFuture.thenCompose((playerEntity -> {
                     Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), playerEntity, JSONObject.parseObject(new String(msg.getData()), methodHandler.getParamType()));
@@ -104,6 +105,9 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
             return future.thenAccept(obj -> {
                 // todo  存储，并且将响应发到端
                 NetMsg responseNetMsg = NetUtils.buildResponseMsg(msg.getMsgCode(), msg.getRequestId(), encode(obj));
+                long t2 = System.currentTimeMillis();
+                responseNetMsg.setSystemTime(t2);
+                responseNetMsg.setProcessTime((int) (t2 - t1));
                 netChannel.sendMsg(responseNetMsg);
             }).toCompletableFuture();
         });

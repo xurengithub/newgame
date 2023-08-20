@@ -23,12 +23,13 @@ import java.util.List;
  * @author xuren
  */
 public class GameServer {
+    public static final String IP = "192.168.16.106";
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
         initProperties();
         OperationManager.init("com.xuren.game.logic.scene.options");
         initProtoHandler();
-        initZK();
+//        initZK();
         initMongo();
         initCache();
         initRedis();
@@ -38,7 +39,7 @@ public class GameServer {
     }
 
     private static void initRedis() {
-        LettuceRedis.init("127.0.0.1", 6379, "", "");
+        LettuceRedis.init(IP, 6379, "", "");
     }
 
     private static void initCache() {
@@ -89,7 +90,7 @@ public class GameServer {
 
         ZKConfig.instance.setSessionTimeoutMs(60000);
         ZKConfig.instance.setConnectionTimeoutMs(5000);
-        ZKConfig.instance.setConnectString("127.0.0.1:2181");
+        ZKConfig.instance.setConnectString(IP + ":2181");
         ZKConfig.instance.setElapsedTimeMs(5000);
         ZKConfig.instance.setNamespace("game");
         ZKConfig.instance.setRetryCount(5);
@@ -101,7 +102,7 @@ public class GameServer {
         MongoConfig.instance.setPassword("123456");
         MongoConfig.instance.setUsername("root");
         MongoConfig.instance.setDbName(BaseConfig.getInstance().getSec());
-        MongoConfig.instance.setCluster(List.of(new HostConfig("127.0.0.1", 27017)));
+        MongoConfig.instance.setCluster(List.of(new HostConfig(IP, 27017)));
         // todo 初始化属性系统
         // 希望先加载.properties文件
         // 然后程序—D的属性
