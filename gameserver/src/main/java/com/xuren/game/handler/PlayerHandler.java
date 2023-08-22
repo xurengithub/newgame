@@ -7,6 +7,7 @@ import com.xuren.game.common.proto.MsgBase;
 import com.xuren.game.common.proto.ProtoHandler;
 import com.xuren.game.common.proto.Interface;
 import com.xuren.game.common.redis.LettuceRedis;
+import com.xuren.game.consts.MsgCodeConsts;
 import com.xuren.game.handler.params.LoginParams;
 import com.xuren.game.logic.scene.SceneManager;
 import com.xuren.game.logic.scene.components.HealthComponent;
@@ -27,7 +28,7 @@ import java.util.concurrent.CompletionStage;
  */
 @ProtoHandler(module = 10000)
 public class PlayerHandler {
-    @Interface(code = 10001, desc = "登陆接口")
+    @Interface(code = MsgCodeConsts.LOGIN, desc = "登陆接口")
     public CompletionStage<MsgLogin> login(PlayerEntity player, LoginParams params) {
         Log.data.info("login params:{}", JSON.toJSONString(params));
         MsgLogin msgLogin = new MsgLogin();
