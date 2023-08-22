@@ -6,14 +6,17 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xuren.game.cache.PlayerCache;
 import com.xuren.game.common.excecutor.LogicExecutors;
 import com.xuren.game.common.log.Log;
+import com.xuren.game.common.net.NetMsgCodecUtils;
 import com.xuren.game.common.net.channel.NetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.NetUtils;
+import com.xuren.game.common.net.channel.TcpNetChannel;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import com.xuren.game.common.proto.MethodHandler;
 import com.xuren.game.common.proto.ProtoHandlerManager;
 import com.xuren.game.common.redis.LettuceRedis;
+import com.xuren.game.consts.MsgCodeConsts;
 import com.xuren.game.consts.RedisConsts;
 import com.xuren.game.logic.scene.SceneManager;
 import com.xuren.game.logic.scene.events.SceneEvent;
@@ -33,7 +36,7 @@ import java.util.concurrent.CompletionStage;
 public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NetMsg msg) throws Exception {
-        NetChannel netChannel = NetChannel.findNetChannel(ctx);
+        NetChannel netChannel = TcpNetChannel.findNetChannel(ctx);
         if (msg.getType() == TypeEnum.DATA) {
             if (!StringUtils.hasText(msg.getRid())) {
                 throw new IllegalStateException("netMsg has not rid");
@@ -67,13 +70,7 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
                     SceneEvent sceneEvent = new SceneEvent();
                     sceneEvent.setRid(playerEntity.getRid());
                     sceneEvent.setOperations(List.of(operationObj));
-                    if (!StringUtils.hasText(playerEntity.getSceneId())) {
-                        SceneManager.enterDefaultScene(playerEntity);
-                    } else {
-                        if (!SceneManager.inScene(playerEntity)) {
-                            SceneManager.getScene(playerEntity.getSceneId()).enter(playerEntity);
-                        }
-                    }
+                    SceneManager.initInScene(playerEntity);
                     SceneManager.getScene(playerEntity.getSceneId()).addSceneEvent(sceneEvent);
                 } else {
                     Log.data.error("no player:{} cache, can not sync scene", msg.getRid());
@@ -90,6 +87,9 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
         MethodHandler methodHandler = ProtoHandlerManager.getInterface(msg.getMsgCode());
         var playerFuture = PlayerCache.getAsync(msg.getRid());
         LogicExecutors.orderExecutor.compose(msg.getRid(), () -> {
+            if (msg.getMsgCode() == MsgCodeConsts.LOGIN) {
+                OnlineNetChannels.putChannel(msg.getRid(), netChannel);
+            }
             // todo checktoken
 //            Object returnValue = methodHandler.getMethodAccess().invoke(handler, methodHandler.getMethod().getName(), msg.getRid(), JSONObject.parseObject(new String(msg.getData()), methodHandler.getParamType()));
             CompletionStage<Object> future;
@@ -104,32 +104,22 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
             }
             return future.thenAccept(obj -> {
                 // todo  存储，并且将响应发到端
-                NetMsg responseNetMsg = NetUtils.buildResponseMsg(msg.getMsgCode(), msg.getRequestId(), encode(obj));
                 long t2 = System.currentTimeMillis();
-                responseNetMsg.setSystemTime(t2);
-                responseNetMsg.setProcessTime((int) (t2 - t1));
+                NetMsg responseNetMsg = NetUtils.buildResponseMsg(msg.getMsgCode(), msg.getRequestId(), NetMsgCodecUtils.obj2Bytes(obj), t2, (int) (t2 - t1));
                 netChannel.sendMsg(responseNetMsg);
             }).toCompletableFuture();
+        }).exceptionally(t -> {
+            if (msg.getMsgCode() == MsgCodeConsts.LOGIN) {
+                OnlineNetChannels.removeChannel(msg.getRid());
+            }
+            Log.data.error("execute error", t);
+            return null;
         });
     }
 
     private void checkToken(String uid, String token) {
         if (!LettuceRedis.sync().get(RedisConsts.TOKEN + ":" + uid).equals(token)) {
             throw new RuntimeException("token error");
-        }
-    }
-
-    private static byte[] encode(Object content) {
-        if (content instanceof byte[]) {
-            return (byte[]) content;
-        } else if (content instanceof CharSequence) {
-            return ((CharSequence) content).toString().getBytes(StandardCharsets.UTF_8);
-        } else {
-            return JSON.toJSONString(
-                content,
-                // 使fastjson序列化逻辑符合json标准
-                SerializerFeature.DisableCircularReferenceDetect, SerializerFeature.WriteNonStringKeyAsString
-            ).getBytes(StandardCharsets.UTF_8);
         }
     }
 }

@@ -3,13 +3,24 @@ package com.xuren.game.logic.scene.systems.aoi;
 import com.beust.jcommander.internal.Sets;
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
+import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.NetMsgCodecUtils;
+import com.xuren.game.common.net.NetUtils;
+import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
+import com.xuren.game.logic.scene.syncmsg.AOIUpdateSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
+import com.xuren.game.net.NetMsgSendUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 世界坐标x,z都是正的
@@ -76,10 +87,39 @@ public class GridManager {
         int gridId = nextGridId(playerEntity);
         int oldGridId = objGridIdMap.get(playerEntity.getRid());
         if (objGridIdMap.containsKey(playerEntity.getRid()) && oldGridId != gridId) {
+            Set<Integer> currGrids = currObserverGridIdList(playerEntity);
+            Set<Integer> nextGrids = nextObserverGridIdList(playerEntity);
+            var leaveGrids = CollectionUtils.subtract(currGrids, nextGrids);
+            List<String> leaveRids = Lists.newArrayList();
+            for(Integer leaveGridId : leaveGrids) {
+                leaveRids.addAll(getGrid(leaveGridId).getPlayers().stream().map(PlayerEntity::getRid).collect(Collectors.toList()));
+            }
+
+            List<String> enterRids = Lists.newArrayList();
+            List<PlayerEntity> enterPlayers = Lists.newArrayList();
+            var enterGrids = CollectionUtils.subtract(nextGrids, currGrids);
+            for(Integer enterGridId : enterGrids) {
+                enterPlayers.addAll(getGrid(enterGridId).getPlayers());
+                enterRids.addAll(getGrid(enterGridId).getPlayers().stream().map(PlayerEntity::getRid).collect(Collectors.toList()));
+            }
             // 将角色从老格子移除
             removeObj(playerEntity);
             // 将角色加入新格子
             addObj(playerEntity);
+
+            // 广播离开消息
+            LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(playerEntity.getRid());
+            NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
+            NetMsgSendUtils.broadcast(leaveRids, leaveMsg);
+
+            //  广播进入消息
+            TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
+            NetMsg enterMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
+            NetMsgSendUtils.broadcast(enterRids, enterMsg);
+
+            AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
+            NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
+            NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), aoiUpdate);
         }
     }
 

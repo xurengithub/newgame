@@ -32,4 +32,14 @@ public class KcpNetChannel extends NetChannel{
 
         kcpOnUdp.send(buf);
     }
+
+    @Override
+    public boolean isAlive() {
+        return !kcpOnUdp.isClosed();
+    }
+
+    @Override
+    public void close() {
+        kcpOnUdp.close();
+    }
 }

@@ -1,9 +1,13 @@
 package com.xuren.game.common.net;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+
+import java.nio.charset.StandardCharsets;
 
 import static com.xuren.game.common.net.consts.NetConstants.*;
 
@@ -64,13 +68,26 @@ public class NetUtils {
         bf.writeBytes(msg.getData());
     }
 
-    public static NetMsg buildResponseMsg(int msgCode, int requestId, byte[] data) {
+    public static NetMsg buildResponseMsg(int msgCode, int requestId, byte[] data, long systemTime, int processTime) {
         NetMsg netMsg = new NetMsg();
         netMsg.setRequestId(requestId);
         netMsg.setMsgCode(msgCode);
         netMsg.setType(TypeEnum.DATA);
         netMsg.setPackageTypeEnum(PackageTypeEnum.RESPONSE);
+        netMsg.setSystemTime(systemTime);
+        netMsg.setProcessTime(processTime);
         netMsg.setData(data);
+        return netMsg;
+    }
+
+    public static NetMsg buildSceneSyncMsg(int msgCode, int requestId, Object data, long systemTime) {
+        NetMsg netMsg = new NetMsg();
+        netMsg.setType(TypeEnum.DATA);
+        netMsg.setPackageTypeEnum(PackageTypeEnum.SCENE_SYNC);
+        netMsg.setRequestId(requestId);
+        netMsg.setMsgCode(msgCode);
+        netMsg.setSystemTime(systemTime);
+        netMsg.setData(NetMsgCodecUtils.obj2Bytes(data));
         return netMsg;
     }
 }

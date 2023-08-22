@@ -2,7 +2,11 @@ package com.xuren.game.logic.scene;
 
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
+import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.NetMsgCodecUtils;
+import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.components.JoystickComponent;
+import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.events.SceneEvent;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
@@ -10,11 +14,16 @@ import com.xuren.game.logic.scene.options.FindWayOption;
 import com.xuren.game.logic.scene.options.JoystickOption;
 import com.xuren.game.logic.scene.options.Operation;
 import com.xuren.game.logic.scene.options.OperationType;
+import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
 import com.xuren.game.logic.scene.systems.aoi.AOISystem;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
 import com.xuren.game.logic.scene.utils.VectorUtils;
+import com.xuren.game.net.NetMsgSendUtils;
+import com.xuren.game.net.OnlineNetChannels;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
 
@@ -24,6 +33,7 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Scene {
     private String id;
@@ -59,10 +69,17 @@ public class Scene {
         playerEntity.getTransformComponent().setEulerY(initEulerY);
         playerEntity.setState(SceneState.IDLE);
         gridManager.addObj(playerEntity);
-
-        // todo   通知这些人自己进来了
-        gridManager.getCurrObserverPlayers(playerEntity);
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
+
+        // 通知这些人自己进来了
+        var observerPlayers = gridManager.getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
+        TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
+        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(observerPlayers, netMsg);
+
+        SceneEnterSyncMsg sceneEnterSyncMsg = new SceneEnterSyncMsg(id, playerEntity.getTransformComponent(), gridManager.getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
+        NetMsg myNetMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, sceneEnterSyncMsg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
     }
 
     public boolean inScene(String rid) {
@@ -71,9 +88,13 @@ public class Scene {
 
     public void leave(String rid) {
         // todo   通知这些人自己离开了
-        gridManager.getCurrObserverPlayers(onlinePlayerMap.get(rid));
+        var observerPlayers = gridManager.getCurrObserverPlayers(onlinePlayerMap.get(rid)).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
         gridManager.removeObj(onlinePlayerMap.get(rid));
         onlinePlayerMap.remove(rid);
+
+        LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(rid);
+        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(observerPlayers, netMsg);
     }
 
     public void addSceneEvent(SceneEvent event) {

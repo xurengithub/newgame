@@ -5,4 +5,8 @@ package com.xuren.game.common.net.channel;
  */
 public interface INetChannel {
     void sendMsg(Object msg);
+
+    boolean isAlive();
+
+    void close();
 }

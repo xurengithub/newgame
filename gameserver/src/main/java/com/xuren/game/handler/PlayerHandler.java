@@ -8,12 +8,14 @@ import com.xuren.game.common.proto.ProtoHandler;
 import com.xuren.game.common.proto.Interface;
 import com.xuren.game.common.redis.LettuceRedis;
 import com.xuren.game.handler.params.LoginParams;
+import com.xuren.game.logic.scene.SceneManager;
 import com.xuren.game.logic.scene.components.HealthComponent;
 import com.xuren.game.logic.scene.components.TransformComponent;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.proto.MsgLogin;
 import com.xuren.game.proto.PlayerSimpleInfo;
 import org.recast4j.detour.extras.Vector3f;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,8 +38,12 @@ public class PlayerHandler {
                     .getReactiveMongoTemplate()
                     .insert(createPlayer(params.rid))
                     .toFuture()
-                    .thenApply(playerEntity -> msgLogin);
+                    .thenApply(playerEntity -> {
+                        SceneManager.initInScene(playerEntity);
+                        return msgLogin;
+                    });
         }
+
 //        PlayerSimpleInfo[] playerSimpleInfos = new PlayerSimpleInfo[1];
 //        msgLogin.setPlayerSimpleInfos();
         return CompletableFuture.completedStage(msgLogin);

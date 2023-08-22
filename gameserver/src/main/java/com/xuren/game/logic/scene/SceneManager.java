@@ -3,6 +3,7 @@ package com.xuren.game.logic.scene;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
+import org.springframework.util.StringUtils;
 import org.testng.collections.Maps;
 
 import java.io.IOException;
@@ -46,5 +47,15 @@ public abstract class SceneManager {
         Scene scene = new Scene();
         scene.init("1", easy3dNav, gridManager);
         return scene;
+    }
+
+    public static void initInScene(PlayerEntity playerEntity) {
+        if (!StringUtils.hasText(playerEntity.getSceneId())) {
+            SceneManager.enterDefaultScene(playerEntity);
+        } else {
+            if (!SceneManager.inScene(playerEntity)) {
+                SceneManager.getScene(playerEntity.getSceneId()).enter(playerEntity);
+            }
+        }
     }
 }
