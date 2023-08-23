@@ -2,14 +2,20 @@ package com.xuren.game.logic.scene.systems.action;
 
 import com.alibaba.fastjson.JSON;
 import com.xuren.game.common.log.Log;
+import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.Scene;
 import com.xuren.game.logic.scene.components.TransformComponent;
+import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
+import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 import com.xuren.game.logic.scene.utils.EulerUtils;
+import com.xuren.game.net.NetMsgSendUtils;
 import org.recast4j.detour.extras.Vector3f;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class JoystickSystem {
     public static void update(PlayerEntity playerEntity, Scene scene, Easy3dNav easy3dNav) {
@@ -32,5 +38,8 @@ public abstract class JoystickSystem {
         Log.data.debug("playerComponent:{} x:{} z:{}", JSON.toJSONString(pos), x, z);
         // todo 将位置同步给感兴趣的玩家
         List<PlayerEntity> observerPlayers = scene.getGridManager().getCurrObserverPlayers(playerEntity);
+        TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
+        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(observerPlayers.stream().map(PlayerEntity::getRid).collect(Collectors.toList()), netMsg);
     }
 }
