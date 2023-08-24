@@ -12,7 +12,9 @@ public enum OperationType {
     /**
      * FindWay
      */
-    FIND_WAY(1),;
+    FIND_WAY(1),
+    SWITCH_SCENE(2)
+    ,;
 
     OperationType(int type) {
         this.type = type;

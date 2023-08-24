@@ -10,10 +10,7 @@ import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.events.SceneEvent;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
-import com.xuren.game.logic.scene.options.FindWayOption;
-import com.xuren.game.logic.scene.options.JoystickOption;
-import com.xuren.game.logic.scene.options.Operation;
-import com.xuren.game.logic.scene.options.OperationType;
+import com.xuren.game.logic.scene.options.*;
 import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
 import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
 import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
@@ -63,7 +60,7 @@ public class Scene {
     }
 
     public void enter(PlayerEntity playerEntity) {
-        Log.data.debug("player:{} enter scene", playerEntity.getRid());
+        Log.data.debug("player:{} enter scene:{}", playerEntity.getRid(), id);
         playerEntity.setSceneId(id);
         playerEntity.getTransformComponent().setPosition(VectorUtils.cloneVector(initPos));
         playerEntity.getTransformComponent().setEulerY(initEulerY);
@@ -87,6 +84,7 @@ public class Scene {
     }
 
     public void leave(String rid) {
+        Log.data.debug("player:{} leave scene:{}", rid, id);
         // todo   通知这些人自己离开了
         var observerPlayers = gridManager.getCurrObserverPlayers(onlinePlayerMap.get(rid)).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
         gridManager.removeObj(onlinePlayerMap.get(rid));
@@ -159,6 +157,12 @@ public class Scene {
                 if (Objects.nonNull(playerEntity.getTransformComponent())) {
                     processJoystick(playerEntity, joyStickOption);
                 }
+            }
+
+            if (opt.getOperationType() == OperationType.SWITCH_SCENE.getType()) {
+                SwitchSceneOption switchSceneOption = (SwitchSceneOption) opt;
+                SceneManager.getScene(playerEntity.getSceneId()).leave(playerEntity.getRid());
+                SceneManager.getScene(switchSceneOption.getSceneId()).enter(playerEntity);
             }
         }
     }
