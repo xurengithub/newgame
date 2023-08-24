@@ -33,8 +33,8 @@ public class GameServer {
         initMongo();
         initCache();
         initRedis();
+        initScene();
         initNet();
-//        initScene();
 
     }
 

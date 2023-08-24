@@ -44,7 +44,7 @@ public class PlayerHandler {
                         return msgLogin;
                     });
         }
-
+        SceneManager.initInScene(player);
 //        PlayerSimpleInfo[] playerSimpleInfos = new PlayerSimpleInfo[1];
 //        msgLogin.setPlayerSimpleInfos();
         return CompletableFuture.completedStage(msgLogin);
@@ -55,7 +55,7 @@ public class PlayerHandler {
         player.setSceneId("");
         player.setRid(rid);
 
-        TransformComponent transformComponent = new TransformComponent(new Vector3f(0, 30, 0), 30, 10);
+        TransformComponent transformComponent = new TransformComponent(new Vector3f(0, 30, 0), 30, 5);
         player.setTransformComponent(transformComponent);
 
         HealthComponent healthComponent = new HealthComponent(100, 100);

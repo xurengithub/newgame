@@ -52,7 +52,7 @@ public class Scene {
         this.id = id;
         this.easy3dNav = easy3dNav;
         this.gridManager = gridManager;
-        this.initPos = new Vector3f(0, 0, 0);
+        this.initPos = new Vector3f(92.07f, 4.1f, 67.81f);
         this.initEulerY = 45;
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "game-loop-pool"));
@@ -68,15 +68,15 @@ public class Scene {
         gridManager.addObj(playerEntity);
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
 
+        SceneEnterSyncMsg sceneEnterSyncMsg = new SceneEnterSyncMsg(playerEntity.getRid(), id, playerEntity, gridManager.getCurrObserverPlayers(playerEntity));
+        NetMsg myNetMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, sceneEnterSyncMsg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
+
         // 通知这些人自己进来了
         var observerPlayers = gridManager.getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
         TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
         NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
         NetMsgSendUtils.broadcast(observerPlayers, netMsg);
-
-        SceneEnterSyncMsg sceneEnterSyncMsg = new SceneEnterSyncMsg(id, playerEntity.getTransformComponent(), gridManager.getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
-        NetMsg myNetMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, sceneEnterSyncMsg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
     }
 
     public boolean inScene(String rid) {
@@ -107,7 +107,7 @@ public class Scene {
         this.deltaTime = (this.deltaTimeMs / 1000.0f);
         this.prevTimeMs = curMs;
         onLogicUpdate();
-        Log.data.info("gameLoop time:{}", System.currentTimeMillis() - this.prevTimeMs);
+//        Log.data.info("gameLoop time:{}", System.currentTimeMillis() - this.prevTimeMs);
     }
 
     private void onLogicUpdate() {

@@ -3,6 +3,7 @@ package com.xuren.game.logic.scene.options;
 /**
  * @author xuren
  */
+@OperationAnnotation(type = OperationType.JOYSTICK)
 public class JoystickOption extends Operation{
     private boolean open;
     private float degree;

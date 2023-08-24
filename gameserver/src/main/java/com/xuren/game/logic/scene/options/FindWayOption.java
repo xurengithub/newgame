@@ -5,6 +5,7 @@ import org.recast4j.detour.extras.Vector3f;
 /**
  * @author xuren
  */
+@OperationAnnotation(type = OperationType.FIND_WAY)
 public class FindWayOption extends Operation{
     private Vector3f point;
 

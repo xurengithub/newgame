@@ -16,7 +16,7 @@ public abstract class NetMsgCodecUtils {
     public static void encodeResponse(NetMsg msg, ByteBuf bf) {
         // todo 长度，类型data、包类型response、请求id、msgCode、同步时间、处理时间、长度、数据
 //        ByteBuf bf = Unpooled.buffer(1 + 1 + 4 + 8 + 4 + 4 + data.length);
-        bf.writeInt(1 + 1 + 4 + 8 + 4 + 4 + msg.getData().length);
+        bf.writeInt(1 + 1 + 4 + 4 + 8 + 4 + 4 + msg.getData().length);
         bf.writeByte(msg.getType().value());
         bf.writeByte(msg.getPackageTypeEnum().value());
         bf.writeInt(msg.getRequestId());
@@ -55,7 +55,7 @@ public abstract class NetMsgCodecUtils {
     public static void encodeSceneSyncMsg(NetMsg msg, ByteBuf bf) {
         // todo 长度，类型data、包类型response、请求id、msgCode、同步时间、处理时间、长度、数据
 //        ByteBuf bf = Unpooled.buffer(1 + 1 + 4 + 8 + 4 + 4 + data.length);
-        bf.writeInt(1 + 1 + 4 + 8 + 4 + msg.getData().length);
+        bf.writeInt(1 + 1 + 4 + 4 + 8 + 4 + msg.getData().length);
         bf.writeByte(msg.getType().value());
         bf.writeByte(msg.getPackageTypeEnum().value());
         bf.writeInt(msg.getRequestId());

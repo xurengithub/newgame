@@ -1,6 +1,6 @@
 package com.xuren.game.logic.scene.syncmsg;
 
-import com.xuren.game.logic.scene.components.TransformComponent;
+import com.xuren.game.logic.scene.entities.PlayerEntity;
 
 import java.util.List;
 
@@ -8,17 +8,27 @@ import java.util.List;
  * @author xuren
  */
 public class SceneEnterSyncMsg {
+    private String playerId;
     // 场景id
     private String sceneId;
     // 我的场景内信息
-    private TransformComponent myPlayer;
+    private PlayerEntity myPlayer;
     // 其他人信息
-    private List<TransformComponent> otherPlayers;
+    private List<PlayerEntity> otherPlayers;
 
-    public SceneEnterSyncMsg(String sceneId, TransformComponent myPlayer, List<TransformComponent> otherPlayers) {
+    public SceneEnterSyncMsg(String playerId, String sceneId, PlayerEntity myPlayer, List<PlayerEntity> otherPlayers) {
+        this.playerId = playerId;
         this.sceneId = sceneId;
         this.myPlayer = myPlayer;
         this.otherPlayers = otherPlayers;
+    }
+
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 
     public String getSceneId() {
@@ -29,19 +39,19 @@ public class SceneEnterSyncMsg {
         this.sceneId = sceneId;
     }
 
-    public TransformComponent getMyPlayer() {
+    public PlayerEntity getMyPlayer() {
         return myPlayer;
     }
 
-    public void setMyPlayer(TransformComponent myPlayer) {
+    public void setMyPlayer(PlayerEntity myPlayer) {
         this.myPlayer = myPlayer;
     }
 
-    public List<TransformComponent> getOtherPlayers() {
+    public List<PlayerEntity> getOtherPlayers() {
         return otherPlayers;
     }
 
-    public void setOtherPlayers(List<TransformComponent> otherPlayers) {
+    public void setOtherPlayers(List<PlayerEntity> otherPlayers) {
         this.otherPlayers = otherPlayers;
     }
 }
