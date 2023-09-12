@@ -50,7 +50,6 @@ public abstract class PlayerCache {
     }
 
     public static void clear() {
-        instance.synchronous().policy().expireAfterAccess().orElseThrow().setExpiresAfter(Duration.ZERO);
-        instance.asMap().clear();
+        instance.synchronous().invalidateAll();
     }
 }
