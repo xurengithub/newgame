@@ -8,4 +8,20 @@ public class Log {
     private static class Data {
 
     }
+
+    /**
+     * 数据库日志
+     */
+    private static class Db {
+
+    }
+
+    /**
+     * 协议日志
+     */
+    private static class Access {
+
+    }
+
+
 }
