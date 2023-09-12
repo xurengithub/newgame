@@ -21,7 +21,7 @@ public abstract class PlayerCache {
                 .removalListener((key, value, cause) -> {
                     if (value != null) {
                         MongodbService.getMongodbService(BaseConfig.getInstance().getSec()).getReactiveMongoTemplate()
-                                .insert(value)
+                                .save(value)
                                 .doOnError(throwable -> Log.data.error("PlayerCache remove save error", throwable))
                                 .subscribe();
                     }
