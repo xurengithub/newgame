@@ -26,6 +26,7 @@ public class GameServer {
     public static final String IP = "192.168.16.106";
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
+        initHook();
         initProperties();
         OperationManager.init("com.xuren.game.logic.scene.options");
         initProtoHandler();
@@ -36,6 +37,14 @@ public class GameServer {
         initScene();
         initNet();
 
+    }
+
+    private static void initHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Log.data.info("Shutdown Hook Start");
+            PlayerCache.clear();
+            Log.data.info("Shutdown Hook End");
+        }));
     }
 
     private static void initRedis() {

@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -46,5 +47,10 @@ public abstract class PlayerCache {
 
     public static CompletableFuture<PlayerEntity> getAsync(String rid) {
         return instance.get(rid);
+    }
+
+    public static void clear() {
+        instance.synchronous().policy().expireAfterAccess().orElseThrow().setExpiresAfter(Duration.ZERO);
+        instance.asMap().clear();
     }
 }
