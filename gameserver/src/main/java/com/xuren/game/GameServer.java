@@ -1,9 +1,14 @@
 package com.xuren.game;
 
+import com.google.api.client.util.Lists;
+import com.xuren.game.cache.NodeCache;
 import com.xuren.game.common.config.BaseConfig;
 import com.xuren.game.common.config.HostConfig;
 import com.xuren.game.common.db.mongo.MongoConfig;
 import com.xuren.game.common.db.mongo.MongodbService;
+import com.xuren.game.common.grpc.GrpcServerManager;
+import com.xuren.game.common.grpc.IService;
+import com.xuren.game.common.grpc.MyService;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.tcp.server.NettyTcpServer;
 import com.xuren.game.common.proto.ProtoHandlerManager;
@@ -14,6 +19,7 @@ import com.xuren.game.cache.PlayerCache;
 import com.xuren.game.logic.scene.SceneManager;
 import com.xuren.game.logic.scene.options.OperationManager;
 import com.xuren.game.net.NettyTcpServerInitializer;
+import io.grpc.BindableService;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,13 +36,20 @@ public class GameServer {
         initProperties();
         OperationManager.init("com.xuren.game.logic.scene.options");
         initProtoHandler();
-//        initZK();
+        initZK();
         initMongo();
         initCache();
         initRedis();
         initScene();
         initNet();
+        initRpc();
+    }
 
+    private static void initRpc() {
+        var definition = GrpcServerManager.wrap(IService.class, new MyService());
+        List<BindableService> bindableServices = Lists.newArrayList();
+        bindableServices.add(() -> definition);
+        GrpcServerManager.start(BaseConfig.getInstance().getRpcPort(), bindableServices);
     }
 
     private static void initHook() {
@@ -53,6 +66,7 @@ public class GameServer {
 
     private static void initCache() {
         PlayerCache.init();
+        NodeCache.init();
     }
 
     private static void initMongo() {
@@ -96,6 +110,8 @@ public class GameServer {
     private static void initProperties() {
         BaseConfig.getInstance().setSec("1");
         BaseConfig.getInstance().setNetPort(55667);
+
+        BaseConfig.getInstance().setRpcPort(55668);
 
         ZKConfig.instance.setSessionTimeoutMs(60000);
         ZKConfig.instance.setConnectionTimeoutMs(5000);

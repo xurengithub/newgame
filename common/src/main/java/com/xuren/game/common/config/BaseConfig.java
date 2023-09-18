@@ -6,6 +6,8 @@ public class BaseConfig {
 
     private int netPort;
 
+    private int rpcPort;
+
 
     public static BaseConfig getInstance() {
         return instance;
@@ -25,5 +27,13 @@ public class BaseConfig {
 
     public void setNetPort(int netPort) {
         this.netPort = netPort;
+    }
+
+    public int getRpcPort() {
+        return rpcPort;
+    }
+
+    public void setRpcPort(int rpcPort) {
+        this.rpcPort = rpcPort;
     }
 }
