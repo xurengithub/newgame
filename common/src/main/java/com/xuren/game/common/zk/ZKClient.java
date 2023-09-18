@@ -1,5 +1,6 @@
 package com.xuren.game.common.zk;
 
+import com.alibaba.fastjson.JSON;
 import com.xuren.game.common.Node;
 import com.xuren.game.common.config.BaseConfig;
 import org.apache.curator.framework.CuratorFramework;
@@ -48,7 +49,7 @@ public class ZKClient {
             node.setType("GAME_SERVER");
             node.setRpcPort(BaseConfig.getInstance().getRpcPort());
             node.setPort(BaseConfig.getInstance().getNetPort());
-            instance.createEphemeral(rootPath + "/" + path, "".getBytes());
+            instance.createEphemeral(rootPath + "/" + path, JSON.toJSONString(node).getBytes());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
