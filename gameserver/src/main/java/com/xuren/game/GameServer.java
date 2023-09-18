@@ -1,7 +1,7 @@
 package com.xuren.game;
 
 import com.google.api.client.util.Lists;
-import com.xuren.game.cache.NodeCache;
+import com.xuren.game.common.cache.NodeCache;
 import com.xuren.game.common.config.BaseConfig;
 import com.xuren.game.common.config.HostConfig;
 import com.xuren.game.common.db.mongo.MongoConfig;

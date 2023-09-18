@@ -1,18 +1,18 @@
-package com.xuren.game.cache;
+package com.xuren.game.common.cache;
 
 import com.alibaba.fastjson.JSON;
 import com.xuren.game.common.Node;
+import com.xuren.game.common.ServerType;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.zk.ZKClient;
 import com.xuren.game.common.zk.ZkConsts;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.testng.collections.Maps;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author xuren
@@ -50,5 +50,13 @@ public abstract class NodeCache {
         } catch (Exception e) {
             Log.system.error("zk cache cannot start.", e);
         }
+    }
+
+    public static List<Node> globals() {
+        return nodes(ServerType.GLOBAL);
+    }
+
+    public static List<Node> nodes(ServerType serverType) {
+        return nodeCache.values().stream().filter(node -> node.getType().equals(serverType.name())).collect(Collectors.toList());
     }
 }

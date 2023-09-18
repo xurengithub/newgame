@@ -1,12 +1,15 @@
 package com.xuren.game.common.grpc;
 
+import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
+import com.xuren.game.common.ServerType;
+import com.xuren.game.common.cache.NodeCache;
+import com.xuren.game.common.utils.RandomUtils;
 import io.grpc.CallOptions;
 import io.grpc.Deadline;
 import io.grpc.MethodDescriptor;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.ClientCalls;
-import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 
 import java.lang.reflect.Method;
@@ -20,13 +23,23 @@ import java.util.stream.Stream;
  */
 public class GrpcClientManager {
     public static void main(String[] args) {
-        System.out.println(get(IService.class).say("hahaha"));;
+        System.out.println(get(IService.class, "127.0.0.1", 9090).say("hahaha"));
 //        ClientCalls.blockingUnaryCall(channel, );
     }
 
-    public static <T> T get(Class<T> clazz) {
-        String ip = "127.0.0.1";
-        int port = 9090;
+    public static <T> T global(Class<T> clazz) {
+        return get(clazz, ServerType.GLOBAL);
+    }
+
+    public static <T> T get(Class<T> clazz, ServerType serverType) {
+        var size = NodeCache.nodes(serverType).size();
+        Preconditions.checkState(size > 0, "serverType:{} server not exists", serverType);
+        var index = RandomUtils.nextInt(0, size);
+        var node = NodeCache.globals().get(index);
+        return get(clazz, node.getIp(), node.getRpcPort());
+    }
+
+    public static <T> T get(Class<T> clazz, String ip, int port) {
         var channel = NettyChannelBuilder.forAddress(ip, port).usePlaintext().maxInboundMessageSize(1024 * 1024 * 10).build();
         var methodMaps = getMethodsMap(clazz);
         ProxyFactory proxyFactory = new ProxyFactory();
@@ -35,12 +48,9 @@ public class GrpcClientManager {
         } else {
             proxyFactory.setSuperclass(clazz);
         }
-        proxyFactory.setHandler(new MethodHandler() {
-            @Override
-            public Object invoke(Object o, Method method, Method method1, Object[] objects) throws Throwable {
-                var descriptor = methodMaps.get(method);
-                return ClientCalls.blockingUnaryCall(channel, descriptor, CallOptions.DEFAULT.withDeadline(Deadline.after(100, TimeUnit.SECONDS)), objects);
-            }
+        proxyFactory.setHandler((o, method, method1, objects) -> {
+            var descriptor = methodMaps.get(method);
+            return ClientCalls.blockingUnaryCall(channel, descriptor, CallOptions.DEFAULT.withDeadline(Deadline.after(100, TimeUnit.SECONDS)), objects);
         });
         try {
             return (T) proxyFactory.createClass().newInstance();
