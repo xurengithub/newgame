@@ -1,5 +1,6 @@
 package com.xuren.game.net;
 
+import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.NetMsg;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public abstract class NetMsgSendUtils {
             var netChannel = OnlineNetChannels.getChannel(rid);
             if (netChannel != null && netChannel.isAlive()) {
                 netChannel.sendMsg(netMsg);
+            } else {
+                Log.system.info("player:{} channel is not active", rid);
             }
         }
     }
