@@ -11,6 +11,7 @@ import io.grpc.stub.ServerCalls;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -57,7 +58,8 @@ public class GrpcServerManager {
                 MethodDescriptor<Object[], Object> methodDescriptor = methodDescriptor(clazz, method);
                 ServerCalls.UnaryMethod<Object[], Object> unaryMethod = (request, responseObserver) -> {
                     try {
-                        var resp = method.invoke(obj, request);
+                        var methodHandle = MethodHandles.lookup().unreflect(method).bindTo(obj);
+                        var resp = methodHandle.invokeWithArguments(request);
                         if (resp instanceof CompletionStage) {
                             ((CompletionStage<?>)resp).whenComplete((d, t) -> {
                                 if (t != null) {
@@ -71,7 +73,7 @@ public class GrpcServerManager {
                             responseObserver.onNext(resp);
                             responseObserver.onCompleted();
                         }
-                    } catch (IllegalAccessException | InvocationTargetException e) {
+                    } catch (Throwable e) {
                         responseObserver.onError(e);
                         Log.system.error("grpc invoke error", e);
                     }
