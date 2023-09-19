@@ -38,11 +38,13 @@ public class GameServer {
         initProtoHandler();
         initZK();
         initMongo();
-        initCache();
         initRedis();
+
+        initCache();
+        initRpc();
+
         initScene();
         initNet();
-        initRpc();
     }
 
     private static void initRpc() {
