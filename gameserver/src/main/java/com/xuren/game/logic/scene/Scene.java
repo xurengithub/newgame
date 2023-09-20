@@ -68,10 +68,8 @@ public class Scene {
         gridManager.addObj(playerEntity);
         onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
 
-        SceneEnterSyncMsg sceneEnterSyncMsg = new SceneEnterSyncMsg(playerEntity.getRid(), id, playerEntity, gridManager.getCurrObserverPlayers(playerEntity));
-        NetMsg myNetMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, sceneEnterSyncMsg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
-
+        // 进入场景消息
+        NetMsgSendUtils.sendEnterSceneMsg(this, playerEntity);
         // 通知这些人自己进来了
         NetMsgSendUtils.broadcastTransformSyncMsg2Interesting(this, playerEntity);
     }
@@ -87,9 +85,7 @@ public class Scene {
         gridManager.removeObj(onlinePlayerMap.get(rid));
         onlinePlayerMap.remove(rid);
 
-        LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(rid);
-        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(observerPlayers, netMsg);
+        NetMsgSendUtils.broadcastLeaveMsg(observerPlayers, rid);
     }
 
     public void addSceneEvent(SceneEvent event) {

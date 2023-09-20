@@ -108,14 +108,12 @@ public class GridManager {
             addObj(playerEntity);
 
             // 广播离开消息
-            NetMsgSendUtils.broadcastLeaveMsg(leaveRids, playerEntity);
+            NetMsgSendUtils.broadcastLeaveMsg(leaveRids, playerEntity.getRid());
 
             //  广播进入消息
             NetMsgSendUtils.broadcastTransformMsg(enterRids, playerEntity);
 
-            AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
-            NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
-            NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), aoiUpdate);
+            NetMsgSendUtils.sendAOIUpdateMsg(leaveRids, enterPlayers, playerEntity);
         }
     }
 

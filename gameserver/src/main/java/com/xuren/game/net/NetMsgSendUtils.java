@@ -6,7 +6,9 @@ import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.Scene;
 import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
+import com.xuren.game.logic.scene.syncmsg.AOIUpdateSyncMsg;
 import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
 import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 
 import java.util.List;
@@ -43,9 +45,21 @@ public abstract class NetMsgSendUtils {
         broadcast(toRids, enterMsg);
     }
 
-    public static void broadcastLeaveMsg(List<String> leaveRids, PlayerEntity playerEntity) {
-        LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(playerEntity.getRid());
+    public static void broadcastLeaveMsg(List<String> leaveRids, String rid) {
+        LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(rid);
         NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
         broadcast(leaveRids, leaveMsg);
+    }
+
+    public static void sendEnterSceneMsg(Scene scene, PlayerEntity playerEntity) {
+        SceneEnterSyncMsg sceneEnterSyncMsg = new SceneEnterSyncMsg(playerEntity.getRid(), scene.getId(), playerEntity, scene.getGridManager().getCurrObserverPlayers(playerEntity));
+        NetMsg myNetMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, sceneEnterSyncMsg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
+    }
+
+    public static void sendAOIUpdateMsg(List<String> leaveRids, List<PlayerEntity> enterPlayers, PlayerEntity playerEntity) {
+        AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
+        NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.AOI_UPDATE, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
+        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), aoiUpdate);
     }
 }
