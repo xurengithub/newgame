@@ -20,12 +20,20 @@ import java.util.stream.Collectors;
 public abstract class NetMsgSendUtils {
     public static void broadcast(List<String> rids, NetMsg netMsg) {
         for (var rid : rids) {
+            sendMsg(rid, netMsg);
+        }
+    }
+
+    public static void sendMsg(String rid, NetMsg netMsg) {
+        try {
             var netChannel = OnlineNetChannels.getChannel(rid);
             if (netChannel != null && netChannel.isAlive()) {
                 netChannel.sendMsg(netMsg);
             } else {
-                Log.system.info("player:{} channel is not active", rid);
+                Log.system.warn("player:{} channel is not active", rid);
             }
+        } catch (Exception e) {
+            Log.system.error("sendMsg error", e);
         }
     }
 
@@ -54,12 +62,12 @@ public abstract class NetMsgSendUtils {
     public static void sendEnterSceneMsg(Scene scene, PlayerEntity playerEntity) {
         SceneEnterSyncMsg sceneEnterSyncMsg = new SceneEnterSyncMsg(playerEntity.getRid(), scene.getId(), playerEntity, scene.getGridManager().getCurrObserverPlayers(playerEntity));
         NetMsg myNetMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, sceneEnterSyncMsg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
+        sendMsg(playerEntity.getRid(), myNetMsg);
     }
 
-    public static void sendAOIUpdateMsg(List<String> leaveRids, List<PlayerEntity> enterPlayers, PlayerEntity playerEntity) {
+    public static void sendAOIUpdateMsg(String rid, List<String> leaveRids, List<PlayerEntity> enterPlayers) {
         AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
         NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.AOI_UPDATE, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), aoiUpdate);
+        sendMsg(rid, aoiUpdate);
     }
 }

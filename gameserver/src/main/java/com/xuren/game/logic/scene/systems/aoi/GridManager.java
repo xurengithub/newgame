@@ -113,7 +113,7 @@ public class GridManager {
             //  广播进入消息
             NetMsgSendUtils.broadcastTransformMsg(enterRids, playerEntity);
 
-            NetMsgSendUtils.sendAOIUpdateMsg(leaveRids, enterPlayers, playerEntity);
+            NetMsgSendUtils.sendAOIUpdateMsg(playerEntity.getRid(), leaveRids, enterPlayers);
         }
     }
 
