@@ -6,6 +6,7 @@ import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.Scene;
 import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
+import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
 import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 
 import java.util.List;
@@ -33,8 +34,18 @@ public abstract class NetMsgSendUtils {
      */
     public static void broadcastTransformSyncMsg2Interesting(Scene scene, PlayerEntity playerEntity) {
         List<String> observerPlayers = scene.getGridManager().getCurrObserverPlayerIds(playerEntity);
+        broadcastTransformMsg(observerPlayers, playerEntity);
+    }
+
+    public static void broadcastTransformMsg(List<String> toRids, PlayerEntity playerEntity) {
         TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
-        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
-        broadcast(observerPlayers, netMsg);
+        NetMsg enterMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
+        broadcast(toRids, enterMsg);
+    }
+
+    public static void broadcastLeaveMsg(List<String> leaveRids, PlayerEntity playerEntity) {
+        LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(playerEntity.getRid());
+        NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
+        broadcast(leaveRids, leaveMsg);
     }
 }

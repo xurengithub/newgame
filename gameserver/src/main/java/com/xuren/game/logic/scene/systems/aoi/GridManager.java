@@ -108,14 +108,10 @@ public class GridManager {
             addObj(playerEntity);
 
             // 广播离开消息
-            LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(playerEntity.getRid());
-            NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
-            NetMsgSendUtils.broadcast(leaveRids, leaveMsg);
+            NetMsgSendUtils.broadcastLeaveMsg(leaveRids, playerEntity);
 
             //  广播进入消息
-            TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
-            NetMsg enterMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
-            NetMsgSendUtils.broadcast(enterRids, enterMsg);
+            NetMsgSendUtils.broadcastTransformMsg(enterRids, playerEntity);
 
             AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
             NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
