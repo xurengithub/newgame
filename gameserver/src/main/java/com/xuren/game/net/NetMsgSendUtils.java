@@ -2,8 +2,14 @@ package com.xuren.game.net;
 
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.NetMsg;
+import com.xuren.game.common.net.NetUtils;
+import com.xuren.game.logic.scene.Scene;
+import com.xuren.game.logic.scene.consts.SceneMsgConsts;
+import com.xuren.game.logic.scene.entities.PlayerEntity;
+import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author xuren
@@ -18,5 +24,17 @@ public abstract class NetMsgSendUtils {
                 Log.system.info("player:{} channel is not active", rid);
             }
         }
+    }
+
+    /**
+     * 广播位置信息
+     * @param scene
+     * @param playerEntity
+     */
+    public static void broadcastTransformSyncMsg2Interesting(Scene scene, PlayerEntity playerEntity) {
+        List<String> observerPlayers = scene.getGridManager().getCurrObserverPlayerIds(playerEntity);
+        TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
+        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
+        broadcast(observerPlayers, netMsg);
     }
 }

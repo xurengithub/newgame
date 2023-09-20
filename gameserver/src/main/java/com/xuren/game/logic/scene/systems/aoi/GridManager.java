@@ -196,6 +196,10 @@ public class GridManager {
         return players;
     }
 
+    public List<String> getCurrObserverPlayerIds(PlayerEntity playerEntity) {
+        return getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
+    }
+
     public Set<Integer> currObserverGridIdList(PlayerEntity playerEntity) {
         int[] gridPos = convertGridPos(objGridIdMap.get(playerEntity.getRid()));
         Set<Integer> set = Sets.newHashSet();

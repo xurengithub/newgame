@@ -37,9 +37,6 @@ public abstract class JoystickSystem {
 //        pos.y = easy3dNav.findHeight(pos);
         Log.data.debug("playerComponent:{} x:{} z:{}", JSON.toJSONString(pos), x, z);
         // todo 将位置同步给感兴趣的玩家
-        List<PlayerEntity> observerPlayers = scene.getGridManager().getCurrObserverPlayers(playerEntity);
-        TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
-        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(observerPlayers.stream().map(PlayerEntity::getRid).collect(Collectors.toList()), netMsg);
+        NetMsgSendUtils.broadcastTransformSyncMsg2Interesting(scene, playerEntity);
     }
 }

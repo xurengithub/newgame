@@ -73,10 +73,7 @@ public class Scene {
         NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), myNetMsg);
 
         // 通知这些人自己进来了
-        var observerPlayers = gridManager.getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
-        TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
-        NetMsg netMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
-        NetMsgSendUtils.broadcast(observerPlayers, netMsg);
+        NetMsgSendUtils.broadcastTransformSyncMsg2Interesting(this, playerEntity);
     }
 
     public boolean inScene(String rid) {
