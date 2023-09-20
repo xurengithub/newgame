@@ -2,25 +2,17 @@ package com.xuren.game.logic.scene;
 
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
-import com.xuren.game.common.net.NetMsg;
-import com.xuren.game.common.net.NetMsgCodecUtils;
-import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.components.JoystickComponent;
-import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
 import com.xuren.game.logic.scene.events.SceneEvent;
 import com.xuren.game.logic.scene.nav.Easy3dNav;
 import com.xuren.game.logic.scene.options.*;
-import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 import com.xuren.game.logic.scene.systems.action.JoystickSystem;
 import com.xuren.game.logic.scene.systems.aoi.AOISystem;
 import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
 import com.xuren.game.logic.scene.utils.VectorUtils;
 import com.xuren.game.net.NetMsgSendUtils;
-import com.xuren.game.net.OnlineNetChannels;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
 
@@ -39,7 +31,7 @@ public class Scene {
     public float deltaTime = 0;
     private final List<SceneEvent> queue = Lists.newArrayList();
 
-    private Map<String, PlayerEntity> onlinePlayerMap = Maps.newHashMap();
+    private Map<String, PlayerEntity> scenePlayerMap = Maps.newConcurrentMap();
 
 //    private Map<Integer, MonsterEntity> monsterMap = Maps.newHashMap();
 
@@ -66,7 +58,7 @@ public class Scene {
         playerEntity.getTransformComponent().setEulerY(initEulerY);
         playerEntity.setState(SceneState.IDLE);
         gridManager.addObj(playerEntity);
-        onlinePlayerMap.put(playerEntity.getRid(), playerEntity);
+        scenePlayerMap.put(playerEntity.getRid(), playerEntity);
 
         // 进入场景消息
         NetMsgSendUtils.sendEnterSceneMsg(this, playerEntity);
@@ -75,15 +67,15 @@ public class Scene {
     }
 
     public boolean inScene(String rid) {
-        return onlinePlayerMap.containsKey(rid);
+        return scenePlayerMap.containsKey(rid);
     }
 
     public void leave(String rid) {
         Log.data.debug("player:{} leave scene:{}", rid, id);
         // todo   通知这些人自己离开了
-        var observerPlayers = gridManager.getCurrObserverPlayers(onlinePlayerMap.get(rid)).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
-        gridManager.removeObj(onlinePlayerMap.get(rid));
-        onlinePlayerMap.remove(rid);
+        var observerPlayers = gridManager.getCurrObserverPlayers(scenePlayerMap.get(rid)).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
+        gridManager.removeObj(scenePlayerMap.get(rid));
+        scenePlayerMap.remove(rid);
 
         NetMsgSendUtils.broadcastLeaveMsg(observerPlayers, rid);
     }
@@ -187,15 +179,15 @@ public class Scene {
     }
 
     private List<PlayerEntity> onlinePlayers() {
-        return Lists.newArrayList(onlinePlayerMap.values());
+        return Lists.newArrayList(scenePlayerMap.values());
     }
 
     private PlayerEntity getOnlinePlayer(String rid) {
-        return onlinePlayerMap.get(rid);
+        return scenePlayerMap.get(rid);
     }
 
-    public Map<String, PlayerEntity> getOnlinePlayerMap() {
-        return onlinePlayerMap;
+    public Map<String, PlayerEntity> getScenePlayerMap() {
+        return scenePlayerMap;
     }
 
     public String getId() {

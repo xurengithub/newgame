@@ -51,11 +51,17 @@ public abstract class SceneManager {
 
     public static void initInScene(PlayerEntity playerEntity) {
         if (!StringUtils.hasText(playerEntity.getSceneId())) {
-            SceneManager.enterDefaultScene(playerEntity);
+            enterDefaultScene(playerEntity);
         } else {
             if (!SceneManager.inScene(playerEntity)) {
-                SceneManager.getScene(playerEntity.getSceneId()).enter(playerEntity);
+                getScene(playerEntity.getSceneId()).enter(playerEntity);
             }
+        }
+    }
+
+    public static void leave(PlayerEntity playerEntity) {
+        if (StringUtils.hasText(playerEntity.getSceneId())) {
+            sceneMap.get(playerEntity.getSceneId()).leave(playerEntity.getRid());
         }
     }
 }

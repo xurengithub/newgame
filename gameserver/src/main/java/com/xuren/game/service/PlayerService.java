@@ -50,4 +50,8 @@ public class PlayerService {
         player.setHealthComponent(healthComponent);
         return player;
     }
+
+    public static void logout(PlayerEntity player) {
+        SceneManager.leave(player);
+    }
 }
