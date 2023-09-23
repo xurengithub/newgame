@@ -4,6 +4,7 @@ import com.google.api.client.util.Lists;
 import com.xuren.game.common.cache.NodeCache;
 import com.xuren.game.common.config.BaseConfig;
 import com.xuren.game.common.config.HostConfig;
+import com.xuren.game.common.dataconfig.NumericService;
 import com.xuren.game.common.db.mongo.MongoConfig;
 import com.xuren.game.common.db.mongo.MongodbService;
 import com.xuren.game.common.grpc.GrpcServerManager;
@@ -37,6 +38,7 @@ public class GameServer {
         OperationManager.init("com.xuren.game.logic.scene.options");
         initProtoHandler();
         initZK();
+        initNumeric();
         initMongo();
         initRedis();
 
@@ -45,6 +47,10 @@ public class GameServer {
 
         initScene();
         initNet();
+    }
+
+    private static void initNumeric() {
+        NumericService.init(BaseConfig.getInstance().getNumericPath(), BaseConfig.getInstance().getNumericPackages());
     }
 
     private static void initRpc() {
@@ -114,6 +120,9 @@ public class GameServer {
         BaseConfig.getInstance().setNetPort(55667);
 
         BaseConfig.getInstance().setRpcPort(55668);
+
+        BaseConfig.getInstance().setNumericPackages("com.xuren.game.common.dataconfig");
+        BaseConfig.getInstance().setNumericPath("");
 
         ZKConfig.instance.setSessionTimeoutMs(60000);
         ZKConfig.instance.setConnectionTimeoutMs(5000);
