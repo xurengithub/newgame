@@ -49,6 +49,7 @@ public abstract class NodeCache {
             Log.system.debug("zk cache stated.");
         } catch (Exception e) {
             Log.system.error("zk cache cannot start.", e);
+            throw new RuntimeException(e);
         }
     }
 
