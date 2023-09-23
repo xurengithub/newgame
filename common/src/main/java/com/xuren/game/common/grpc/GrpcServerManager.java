@@ -31,19 +31,9 @@ public class GrpcServerManager {
         try {
             server.start();
             server.awaitTermination();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void main(String[] args) {
-        var definition = wrap(IService.class, new MyService());
-
-        List<BindableService> bindableServices = Lists.newArrayList();
-        bindableServices.add(() -> definition);
-        start(9090, bindableServices);
     }
 
     public static ServerServiceDefinition wrap(Object obj) {
