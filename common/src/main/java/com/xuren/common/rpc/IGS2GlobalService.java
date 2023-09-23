@@ -1,4 +1,4 @@
-package com.xuren.rpc;
+package com.xuren.common.rpc;
 
 /**
  * @author xuren
