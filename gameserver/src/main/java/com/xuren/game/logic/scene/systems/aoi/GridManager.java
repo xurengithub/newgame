@@ -185,6 +185,37 @@ public class GridManager {
         return players;
     }
 
+    public List<PlayerEntity> getNextObserverPlayers(PlayerEntity playerEntity) {
+        List<PlayerEntity> players = Lists.newArrayList();
+        int[] gridPos = nextGridPos(playerEntity);
+        if (gridPos[0] - 1 > 0) {
+            if (gridPos[1] - 1 > 0) {
+                players.addAll(getGrid(convertGridId(gridPos[0] - 1, gridPos[1] - 1)).getPlayers());
+            }
+            players.addAll(getGrid(convertGridId(gridPos[0] - 1, gridPos[1])).getPlayers());
+            if (gridPos[1] + 1 < zLen) {
+                players.addAll(getGrid(convertGridId(gridPos[0] - 1, gridPos[1] + 1)).getPlayers());
+            }
+        }
+        if (gridPos[1] > 0) {
+            players.addAll(getGrid(convertGridId(gridPos[0], gridPos[1] - 1)).getPlayers());
+        }
+        players.addAll(getGrid(convertGridId(gridPos[0], gridPos[1])).getPlayers());
+        if (gridPos[1] + 1 < zLen) {
+            players.addAll(getGrid(convertGridId(gridPos[0], gridPos[1] + 1)).getPlayers());
+        }
+        if (gridPos[0] + 1 < xLen) {
+            if (gridPos[1] - 1 > 0) {
+                players.addAll(getGrid(convertGridId(gridPos[0] + 1, gridPos[1] - 1)).getPlayers());
+            }
+            players.addAll(getGrid(convertGridId(gridPos[0] + 1, gridPos[1])).getPlayers());
+            if (gridPos[1] + 1 < zLen) {
+                players.addAll(getGrid(convertGridId(gridPos[0] + 1, gridPos[1] + 1)).getPlayers());
+            }
+        }
+        return players;
+    }
+
     public List<String> getCurrObserverPlayerIds(PlayerEntity playerEntity) {
         return getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
     }
