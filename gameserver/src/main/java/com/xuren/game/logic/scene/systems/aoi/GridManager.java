@@ -85,8 +85,8 @@ public class GridManager {
     public void updateObj(PlayerEntity playerEntity) {
         // 1.判断当前所属格子是否和之前格子相同，不同需要更换格子
         int gridId = nextGridId(playerEntity);
-        int oldGridId = objGridIdMap.get(playerEntity.getRid());
-        if (objGridIdMap.containsKey(playerEntity.getRid()) && oldGridId != gridId) {
+        Integer oldGridId = objGridIdMap.get(playerEntity.getRid());
+        if (oldGridId != null && oldGridId != gridId) {
             Set<Integer> currGrids = currObserverGridIdList(playerEntity);
             Set<Integer> nextGrids = nextObserverGridIdList(playerEntity);
             var leaveGrids = CollectionUtils.subtract(currGrids, nextGrids);
@@ -196,37 +196,18 @@ public class GridManager {
 
     public Set<Integer> currObserverGridIdList(PlayerEntity playerEntity) {
         int[] gridPos = convertGridPos(objGridIdMap.get(playerEntity.getRid()));
-        Set<Integer> set = Sets.newHashSet();
-        if (gridPos[0] - 1 > 0) {
-            if (gridPos[1] - 1 > 0) {
-                set.add(convertGridId(gridPos[0] - 1, gridPos[1] - 1));
-            }
-            set.add(convertGridId(gridPos[0] - 1, gridPos[1]));
-            if (gridPos[1] + 1 < zLen) {
-                set.add(convertGridId(gridPos[0] - 1, gridPos[1] + 1));
-            }
-        }
-        if (gridPos[1] > 0) {
-            set.add(convertGridId(gridPos[0], gridPos[1] - 1));
-        }
-        set.add(convertGridId(gridPos[0], gridPos[1]));
-        if (gridPos[1] + 1 < zLen) {
-            set.add(convertGridId(gridPos[0], gridPos[1] + 1));
-        }
-        if (gridPos[0] + 1 < xLen) {
-            if (gridPos[1] - 1 > 0) {
-                set.add(convertGridId(gridPos[0] + 1, gridPos[1] - 1));
-            }
-            set.add(convertGridId(gridPos[0] + 1, gridPos[1]));
-            if (gridPos[1] + 1 < zLen) {
-                set.add(convertGridId(gridPos[0] + 1, gridPos[1] + 1));
-            }
-        }
-        return set;
+        return calAOIGridIds(gridPos);
     }
 
     public Set<Integer> nextObserverGridIdList(PlayerEntity playerEntity) {
         int[] gridPos = convertGridPos(nextGridId(playerEntity));
+        return calAOIGridIds(gridPos);
+    }
+
+    /**
+     *  计算格子AOI格子id集合
+     */
+    private Set<Integer> calAOIGridIds(int[] gridPos) {
         Set<Integer> set = Sets.newHashSet();
         if (gridPos[0] - 1 > 0) {
             if (gridPos[1] - 1 > 0) {
