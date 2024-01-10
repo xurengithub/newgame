@@ -146,7 +146,10 @@ public class Scene {
 
             if (opt.getOperationType() == OperationType.SWITCH_SCENE.getType()) {
                 SwitchSceneOption switchSceneOption = (SwitchSceneOption) opt;
-                SceneManager.getScene(playerEntity.getSceneId()).leave(playerEntity.getRid());
+                var oldScene = SceneManager.getScene(playerEntity.getSceneId());
+                if (oldScene != null) {
+                    oldScene.leave(playerEntity.getRid());
+                }
                 SceneManager.getScene(switchSceneOption.getSceneId()).enter(playerEntity);
             }
         }

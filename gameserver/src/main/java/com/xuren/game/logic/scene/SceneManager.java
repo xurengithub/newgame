@@ -51,7 +51,7 @@ public abstract class SceneManager {
 
     public static void initInScene(PlayerEntity playerEntity) {
         if (!StringUtils.hasText(playerEntity.getSceneId())) {
-            enterDefaultScene(playerEntity);
+            getScene(defaultSceneId).enter(playerEntity);
         } else {
             if (!SceneManager.inScene(playerEntity)) {
                 getScene(playerEntity.getSceneId()).enter(playerEntity);
