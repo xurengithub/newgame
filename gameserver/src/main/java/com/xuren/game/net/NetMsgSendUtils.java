@@ -6,10 +6,7 @@ import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.Scene;
 import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
-import com.xuren.game.logic.scene.syncmsg.AOIUpdateSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
+import com.xuren.game.logic.scene.syncmsg.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +30,7 @@ public abstract class NetMsgSendUtils {
                 Log.system.warn("player:{} channel is not active", rid);
             }
         } catch (Exception e) {
-            Log.system.error("sendMsg error", e);
+            Log.system.error("sendMsg error, rid:{}", rid, e);
         }
     }
 
@@ -53,10 +50,10 @@ public abstract class NetMsgSendUtils {
         broadcast(toRids, enterMsg);
     }
 
-    public static void broadcastLeaveMsg(List<String> leaveRids, String rid) {
-        LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(rid);
-        NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
-        broadcast(leaveRids, leaveMsg);
+    public static void broadcastLeaveGridMsg(List<String> toRids, List<String> rids) {
+        PlayersLeaveGridMsg playersLeaveGridMsg = new PlayersLeaveGridMsg(rids);
+        NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_GRID_SYNC, -1, playersLeaveGridMsg, System.currentTimeMillis());
+        broadcast(toRids, leaveMsg);
     }
 
     public static void sendEnterSceneMsg(Scene scene, PlayerEntity playerEntity) {
@@ -69,5 +66,11 @@ public abstract class NetMsgSendUtils {
         AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
         NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.AOI_UPDATE, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
         sendMsg(rid, aoiUpdate);
+    }
+
+    public static void broadcastEnterGridMsg(List<String> toRids, List<PlayerEntity> enterPlayers) {
+        PlayerEnterGridMsg playerEnterGridMsg = new PlayerEnterGridMsg(enterPlayers);
+        NetMsg enterMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.ENTER_GRID_SYNC, -1, playerEnterGridMsg, System.currentTimeMillis());
+        broadcast(toRids, enterMsg);
     }
 }

@@ -3,15 +3,7 @@ package com.xuren.game.logic.scene.systems.aoi;
 import com.beust.jcommander.internal.Sets;
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
-import com.xuren.game.common.net.NetMsg;
-import com.xuren.game.common.net.NetMsgCodecUtils;
-import com.xuren.game.common.net.NetUtils;
-import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
-import com.xuren.game.logic.scene.syncmsg.AOIUpdateSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 import com.xuren.game.net.NetMsgSendUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.recast4j.detour.extras.Vector3f;
@@ -108,12 +100,15 @@ public class GridManager {
             addObj(playerEntity);
 
             // 广播离开消息
-            NetMsgSendUtils.broadcastLeaveMsg(leaveRids, playerEntity.getRid());
+            NetMsgSendUtils.broadcastLeaveGridMsg(leaveRids, List.of(playerEntity.getRid()));
+            NetMsgSendUtils.broadcastLeaveGridMsg(List.of(playerEntity.getRid()), leaveRids);
+
+            // 广播进入消息
+            NetMsgSendUtils.broadcastEnterGridMsg(List.of(playerEntity.getRid()), enterPlayers);
+            NetMsgSendUtils.broadcastEnterGridMsg(enterRids, List.of(playerEntity));
 
             //  广播进入消息
             NetMsgSendUtils.broadcastTransformMsg(enterRids, playerEntity);
-
-            NetMsgSendUtils.sendAOIUpdateMsg(playerEntity.getRid(), leaveRids, enterPlayers);
         }
     }
 

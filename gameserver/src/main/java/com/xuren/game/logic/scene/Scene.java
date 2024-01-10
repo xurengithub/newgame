@@ -77,7 +77,7 @@ public class Scene {
         gridManager.removeObj(scenePlayerMap.get(rid));
         scenePlayerMap.remove(rid);
 
-        NetMsgSendUtils.broadcastLeaveMsg(observerPlayers, rid);
+        NetMsgSendUtils.broadcastLeaveGridMsg(observerPlayers, List.of(rid));
     }
 
     public void addSceneEvent(SceneEvent event) {
