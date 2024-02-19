@@ -72,6 +72,7 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
                     sceneEvent.setRid(playerEntity.getRid());
                     sceneEvent.setOperations(List.of(operationObj));
                     SceneManager.initInScene(playerEntity);
+                    // todo 会不会出现角色不在这个场景了
                     SceneManager.getScene(playerEntity.getSceneId()).addSceneEvent(sceneEvent);
                 } else {
                     Log.data.error("no player:{} cache, can not sync scene", msg.getRid());

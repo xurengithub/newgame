@@ -74,7 +74,7 @@ public abstract class AStarNavSystem {
         pos.z += aStarComponent.getVz() * dt;
 
         // todo 将位置同步给感兴趣的玩家
-        List<PlayerEntity> observerPlayers = scene.getGridManager().getCurrObserverPlayers(playerEntity);
+//        List<PlayerEntity> observerPlayers = scene.getGridManager().getCurrObserverPlayers(playerEntity);
 
         // todo 剩余的时间走不走呢
 

@@ -131,6 +131,11 @@
             <version>5.1.0</version>
         </dependency>
         <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>4.0.65</version>
+        </dependency>
+        <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-bom</artifactId>
             <version>1.45.1</version>

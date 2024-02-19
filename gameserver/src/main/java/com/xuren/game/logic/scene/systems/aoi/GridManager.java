@@ -3,15 +3,7 @@ package com.xuren.game.logic.scene.systems.aoi;
 import com.beust.jcommander.internal.Sets;
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
-import com.xuren.game.common.net.NetMsg;
-import com.xuren.game.common.net.NetMsgCodecUtils;
-import com.xuren.game.common.net.NetUtils;
-import com.xuren.game.logic.scene.consts.SceneMsgConsts;
 import com.xuren.game.logic.scene.entities.PlayerEntity;
-import com.xuren.game.logic.scene.syncmsg.AOIUpdateSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.LeaveSceneSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.SceneEnterSyncMsg;
-import com.xuren.game.logic.scene.syncmsg.TransformSyncMsg;
 import com.xuren.game.net.NetMsgSendUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.recast4j.detour.extras.Vector3f;
@@ -85,8 +77,8 @@ public class GridManager {
     public void updateObj(PlayerEntity playerEntity) {
         // 1.判断当前所属格子是否和之前格子相同，不同需要更换格子
         int gridId = nextGridId(playerEntity);
-        int oldGridId = objGridIdMap.get(playerEntity.getRid());
-        if (objGridIdMap.containsKey(playerEntity.getRid()) && oldGridId != gridId) {
+        Integer oldGridId = objGridIdMap.get(playerEntity.getRid());
+        if (oldGridId != null && oldGridId != gridId) {
             Set<Integer> currGrids = currObserverGridIdList(playerEntity);
             Set<Integer> nextGrids = nextObserverGridIdList(playerEntity);
             var leaveGrids = CollectionUtils.subtract(currGrids, nextGrids);
@@ -108,18 +100,15 @@ public class GridManager {
             addObj(playerEntity);
 
             // 广播离开消息
-            LeaveSceneSyncMsg leaveSceneSyncMsg = new LeaveSceneSyncMsg(playerEntity.getRid());
-            NetMsg leaveMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.LEAVE_SCENE_SYNC, -1, leaveSceneSyncMsg, System.currentTimeMillis());
-            NetMsgSendUtils.broadcast(leaveRids, leaveMsg);
+            NetMsgSendUtils.broadcastLeaveGridMsg(leaveRids, List.of(playerEntity.getRid()));
+            NetMsgSendUtils.broadcastLeaveGridMsg(List.of(playerEntity.getRid()), leaveRids);
+
+            // 广播进入消息
+            NetMsgSendUtils.broadcastEnterGridMsg(List.of(playerEntity.getRid()), enterPlayers);
+            NetMsgSendUtils.broadcastEnterGridMsg(enterRids, List.of(playerEntity));
 
             //  广播进入消息
-            TransformSyncMsg msg = new TransformSyncMsg(playerEntity.getRid(), playerEntity.getTransformComponent());
-            NetMsg enterMsg = NetUtils.buildSceneSyncMsg(SceneMsgConsts.TRANSFORM_SYNC, -1, msg, System.currentTimeMillis());
-            NetMsgSendUtils.broadcast(enterRids, enterMsg);
-
-            AOIUpdateSyncMsg aoiUpdateSyncMsg = new AOIUpdateSyncMsg(leaveRids, enterPlayers.stream().map(PlayerEntity::getTransformComponent).collect(Collectors.toList()));
-            NetMsg aoiUpdate = NetUtils.buildSceneSyncMsg(SceneMsgConsts.SCENE_ENTER_SYNC, -1, aoiUpdateSyncMsg, System.currentTimeMillis());
-            NetMsgSendUtils.broadcast(List.of(playerEntity.getRid()), aoiUpdate);
+            NetMsgSendUtils.broadcastTransformMsg(enterRids, playerEntity);
         }
     }
 
@@ -196,39 +185,55 @@ public class GridManager {
         return players;
     }
 
-    public Set<Integer> currObserverGridIdList(PlayerEntity playerEntity) {
-        int[] gridPos = convertGridPos(objGridIdMap.get(playerEntity.getRid()));
-        Set<Integer> set = Sets.newHashSet();
+    public List<PlayerEntity> getNextObserverPlayers(PlayerEntity playerEntity) {
+        List<PlayerEntity> players = Lists.newArrayList();
+        int[] gridPos = nextGridPos(playerEntity);
         if (gridPos[0] - 1 > 0) {
             if (gridPos[1] - 1 > 0) {
-                set.add(convertGridId(gridPos[0] - 1, gridPos[1] - 1));
+                players.addAll(getGrid(convertGridId(gridPos[0] - 1, gridPos[1] - 1)).getPlayers());
             }
-            set.add(convertGridId(gridPos[0] - 1, gridPos[1]));
+            players.addAll(getGrid(convertGridId(gridPos[0] - 1, gridPos[1])).getPlayers());
             if (gridPos[1] + 1 < zLen) {
-                set.add(convertGridId(gridPos[0] - 1, gridPos[1] + 1));
+                players.addAll(getGrid(convertGridId(gridPos[0] - 1, gridPos[1] + 1)).getPlayers());
             }
         }
         if (gridPos[1] > 0) {
-            set.add(convertGridId(gridPos[0], gridPos[1] - 1));
+            players.addAll(getGrid(convertGridId(gridPos[0], gridPos[1] - 1)).getPlayers());
         }
-        set.add(convertGridId(gridPos[0], gridPos[1]));
+        players.addAll(getGrid(convertGridId(gridPos[0], gridPos[1])).getPlayers());
         if (gridPos[1] + 1 < zLen) {
-            set.add(convertGridId(gridPos[0], gridPos[1] + 1));
+            players.addAll(getGrid(convertGridId(gridPos[0], gridPos[1] + 1)).getPlayers());
         }
         if (gridPos[0] + 1 < xLen) {
             if (gridPos[1] - 1 > 0) {
-                set.add(convertGridId(gridPos[0] + 1, gridPos[1] - 1));
+                players.addAll(getGrid(convertGridId(gridPos[0] + 1, gridPos[1] - 1)).getPlayers());
             }
-            set.add(convertGridId(gridPos[0] + 1, gridPos[1]));
+            players.addAll(getGrid(convertGridId(gridPos[0] + 1, gridPos[1])).getPlayers());
             if (gridPos[1] + 1 < zLen) {
-                set.add(convertGridId(gridPos[0] + 1, gridPos[1] + 1));
+                players.addAll(getGrid(convertGridId(gridPos[0] + 1, gridPos[1] + 1)).getPlayers());
             }
         }
-        return set;
+        return players;
+    }
+
+    public List<String> getCurrObserverPlayerIds(PlayerEntity playerEntity) {
+        return getCurrObserverPlayers(playerEntity).stream().map(PlayerEntity::getRid).collect(Collectors.toList());
+    }
+
+    public Set<Integer> currObserverGridIdList(PlayerEntity playerEntity) {
+        int[] gridPos = convertGridPos(objGridIdMap.get(playerEntity.getRid()));
+        return calAOIGridIds(gridPos);
     }
 
     public Set<Integer> nextObserverGridIdList(PlayerEntity playerEntity) {
         int[] gridPos = convertGridPos(nextGridId(playerEntity));
+        return calAOIGridIds(gridPos);
+    }
+
+    /**
+     *  计算格子AOI格子id集合
+     */
+    private Set<Integer> calAOIGridIds(int[] gridPos) {
         Set<Integer> set = Sets.newHashSet();
         if (gridPos[0] - 1 > 0) {
             if (gridPos[1] - 1 > 0) {

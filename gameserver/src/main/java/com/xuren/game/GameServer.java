@@ -1,9 +1,14 @@
 package com.xuren.game;
 
+import com.google.api.client.util.Lists;
+import com.xuren.common.rpc.IGlobal2GSService;
+import com.xuren.game.common.cache.NodeCache;
 import com.xuren.game.common.config.BaseConfig;
 import com.xuren.game.common.config.HostConfig;
+import com.xuren.game.common.dataconfig.NumericService;
 import com.xuren.game.common.db.mongo.MongoConfig;
 import com.xuren.game.common.db.mongo.MongodbService;
+import com.xuren.game.common.grpc.GrpcServerManager;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.tcp.server.NettyTcpServer;
 import com.xuren.game.common.proto.ProtoHandlerManager;
@@ -14,6 +19,8 @@ import com.xuren.game.cache.PlayerCache;
 import com.xuren.game.logic.scene.SceneManager;
 import com.xuren.game.logic.scene.options.OperationManager;
 import com.xuren.game.net.NettyTcpServerInitializer;
+import com.xuren.game.rpc.Global2GSService;
+import io.grpc.BindableService;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,16 +33,39 @@ public class GameServer {
     public static final String IP = "192.168.16.106";
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> Log.data.error("defaultUncaughtExceptionHandler threadName:{} error", t.getName(), e));
+        initHook();
         initProperties();
         OperationManager.init("com.xuren.game.logic.scene.options");
         initProtoHandler();
-//        initZK();
+        initZK();
+        initNumeric();
         initMongo();
-        initCache();
         initRedis();
+
+        initCache();
+        initRpc();
+
         initScene();
         initNet();
+    }
 
+    private static void initNumeric() {
+        NumericService.init(BaseConfig.getInstance().getNumericPath(), BaseConfig.getInstance().getNumericPackages());
+    }
+
+    private static void initRpc() {
+        var definition = GrpcServerManager.wrap(IGlobal2GSService.class, new Global2GSService());
+        List<BindableService> bindableServices = Lists.newArrayList();
+        bindableServices.add(() -> definition);
+        GrpcServerManager.start(BaseConfig.getInstance().getRpcPort(), bindableServices);
+    }
+
+    private static void initHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Log.data.info("Shutdown Hook Start");
+            PlayerCache.clear();
+            Log.data.info("Shutdown Hook End");
+        }));
     }
 
     private static void initRedis() {
@@ -44,6 +74,7 @@ public class GameServer {
 
     private static void initCache() {
         PlayerCache.init();
+        NodeCache.init();
     }
 
     private static void initMongo() {
@@ -87,6 +118,11 @@ public class GameServer {
     private static void initProperties() {
         BaseConfig.getInstance().setSec("1");
         BaseConfig.getInstance().setNetPort(55667);
+
+        BaseConfig.getInstance().setRpcPort(55668);
+
+        BaseConfig.getInstance().setNumericPackages("com.xuren.game.common.dataconfig");
+        BaseConfig.getInstance().setNumericPath("");
 
         ZKConfig.instance.setSessionTimeoutMs(60000);
         ZKConfig.instance.setConnectionTimeoutMs(5000);
