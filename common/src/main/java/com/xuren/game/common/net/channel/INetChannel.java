@@ -9,4 +9,6 @@ public interface INetChannel {
     boolean isAlive();
 
     void close();
+
+    void setRid(String rid);
 }

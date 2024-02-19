@@ -3,7 +3,6 @@ package com.xuren.game.logic.scene;
 import com.google.api.client.util.Lists;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.NetMsg;
-import com.xuren.game.common.net.NetMsgCodecUtils;
 import com.xuren.game.common.net.NetUtils;
 import com.xuren.game.logic.scene.components.JoystickComponent;
 import com.xuren.game.logic.scene.consts.SceneMsgConsts;
@@ -20,7 +19,6 @@ import com.xuren.game.logic.scene.systems.aoi.GridManager;
 import com.xuren.game.logic.scene.systems.nav.AStarNavSystem;
 import com.xuren.game.logic.scene.utils.VectorUtils;
 import com.xuren.game.net.NetMsgSendUtils;
-import com.xuren.game.net.OnlineNetChannels;
 import org.recast4j.detour.extras.Vector3f;
 import org.testng.collections.Maps;
 

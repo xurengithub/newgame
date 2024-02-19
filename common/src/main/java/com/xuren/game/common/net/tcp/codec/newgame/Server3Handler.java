@@ -34,18 +34,18 @@ public class Server3Handler extends SimpleChannelInboundHandler<NetMsg> {
 
     }
 
-//    @Override
-//    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-////        super.channelRegistered(ctx);
-//        ctx.fireChannelRegistered(); // 用这个？
-//    }
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        log.info("[{}] channelRegistered", ctx.channel().remoteAddress());
+        super.channelRegistered(ctx);
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         TcpNetChannel tcpNetChannel = new TcpNetChannel(ctx);
 
-        log.info("[{}] connected", ctx.channel().remoteAddress());
+        log.info("[{}] channelActive", ctx.channel().remoteAddress());
         ref.put(ctx.channel(), ctx.channel());
     }
 
@@ -66,7 +66,7 @@ public class Server3Handler extends SimpleChannelInboundHandler<NetMsg> {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         if (log.isDebugEnabled())
-            log.debug("["+ctx.channel().remoteAddress()+"] disconnected");
+            log.debug("["+ctx.channel().remoteAddress()+"] channelInactive");
         Channel channel = ref.remove(ctx.channel());
         if (channel != null)
             channel.close();

@@ -2,11 +2,11 @@ package com.xuren.game.net;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.xuren.game.cache.PlayerCache;
 import com.xuren.game.common.excecutor.LogicExecutors;
 import com.xuren.game.common.log.Log;
 import com.xuren.game.common.net.NetMsgCodecUtils;
+import com.xuren.game.common.net.channel.INetChannel;
 import com.xuren.game.common.net.channel.NetChannel;
 import com.xuren.game.common.net.NetMsg;
 import com.xuren.game.common.net.NetUtils;
@@ -26,9 +26,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
+
+import static com.xuren.game.common.net.consts.NetConstants.KEY_PLAYER_CHANNEL;
 
 /**
  * @author xuren
@@ -121,5 +122,24 @@ public class BusinessHandler extends SimpleChannelInboundHandler<NetMsg> {
         if (!LettuceRedis.sync().get(RedisConsts.TOKEN + ":" + uid).equals(token)) {
             throw new RuntimeException("token error");
         }
+    }
+
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        Log.data.info("[{}] channelUnregistered", ctx.channel().remoteAddress());
+
+        SceneManager.getScene().leave();
+        super.channelUnregistered(ctx);
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        Log.data.info("[{}] userEventTriggered", ctx.channel().remoteAddress());
+        super.userEventTriggered(ctx, evt);
+    }
+
+    private INetChannel findChannel(ChannelHandlerContext context) {
+        return context.channel().attr(KEY_PLAYER_CHANNEL).get();
     }
 }

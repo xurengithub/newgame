@@ -19,11 +19,14 @@ public abstract class OnlineNetChannels {
     }
 
     public static void putChannel(String key, INetChannel netChannel) {
+        netChannel.setRid(key);
         netChannelMap.put(key, netChannel);
     }
 
     public static INetChannel removeChannel(String key) {
-        return netChannelMap.remove(key);
+        var netChannel = netChannelMap.remove(key);
+        netChannel.setRid(null);
+        return netChannel;
     }
 
     public static boolean isOnline(String key) {

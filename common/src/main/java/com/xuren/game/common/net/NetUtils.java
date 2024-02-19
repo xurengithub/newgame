@@ -2,10 +2,12 @@ package com.xuren.game.common.net;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.xuren.game.common.net.channel.INetChannel;
 import com.xuren.game.common.net.enums.PackageTypeEnum;
 import com.xuren.game.common.net.enums.TypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.nio.charset.StandardCharsets;
 
@@ -89,5 +91,9 @@ public class NetUtils {
         netMsg.setSystemTime(systemTime);
         netMsg.setData(NetMsgCodecUtils.obj2Bytes(data));
         return netMsg;
+    }
+
+    public INetChannel findChannel(ChannelHandlerContext context) {
+        return context.channel().attr(KEY_PLAYER_CHANNEL).get();
     }
 }
